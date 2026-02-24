@@ -1,0 +1,4 @@
+[package]
+address = "pipelex/methods"
+version = "0.0.1"
+description = "MTHDS package for methods"
