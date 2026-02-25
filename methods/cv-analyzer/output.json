@@ -1,0 +1,16 @@
+{
+  "output_option_1": {
+    "concept": "candidate_screening.Email",
+    "content": {
+      "text": "text_value"
+    }
+  },
+  "output_option_2": {
+    "concept": "candidate_screening.InterviewQuestion",
+    "content": [
+      {
+        "text": "text_value"
+      }
+    ]
+  }
+}
