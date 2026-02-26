@@ -2,19 +2,22 @@
   "financial_statements": {
     "concept": "native.Document",
     "content": {
-      "url": "https://mock-1a876ba6.invalid/4f2ad578-3a08-44f1-9489-05499fb09a67"
+      "url": "inputs/financial_statements.pdf",
+      "mime_type": "application/pdf"
     }
   },
   "contracts": {
     "concept": "native.Document",
     "content": {
-      "url": "https://mock-4a607155.invalid/f6918b00-c242-443e-815c-0848ab672c00"
+      "url": "inputs/contracts.pdf",
+      "mime_type": "application/pdf"
     }
   },
   "org_chart": {
     "concept": "native.Document",
     "content": {
-      "url": "https://mock-0cf37fe8.invalid/e11d6d78-ae2a-40fb-b0fb-2b776f095a3c"
+      "url": "inputs/org_chart.pdf",
+      "mime_type": "application/pdf"
     }
   }
 }

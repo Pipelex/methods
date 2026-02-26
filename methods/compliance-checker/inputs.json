@@ -1,0 +1,19 @@
+{
+  "document": {
+    "concept": "native.Document",
+    "content": {
+      "url": "https://mock-fe87a39e.invalid/a267f0fa-8eb6-430a-bed4-9e487a35867c"
+    }
+  },
+  "rules": {
+    "concept": "compliance_checking.Rule",
+    "content": [
+      {
+        "rule_id": "rule_id_value",
+        "rule_text": "rule_text_value",
+        "severity": "major",
+        "category": "category_value"
+      }
+    ]
+  }
+}

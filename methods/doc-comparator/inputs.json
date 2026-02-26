@@ -1,0 +1,14 @@
+{
+  "document_a": {
+    "concept": "native.Document",
+    "content": {
+      "url": "https://mock-289f136d.invalid/764039c9-3128-40b2-a034-c9440b8495de"
+    }
+  },
+  "document_b": {
+    "concept": "native.Document",
+    "content": {
+      "url": "https://mock-4e63aab4.invalid/765d8054-b4e9-4053-a675-30343ad714bf"
+    }
+  }
+}

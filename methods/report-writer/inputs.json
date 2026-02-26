@@ -1,0 +1,18 @@
+{
+  "findings": {
+    "concept": "native.JSON",
+    "content": {
+      "json_obj": {
+        "json_obj_key": "json_obj_value"
+      }
+    }
+  },
+  "config": {
+    "concept": "report_writing.ReportConfig",
+    "content": {
+      "format": "executive_summary",
+      "tone": "conversational",
+      "audience": "audience_value"
+    }
+  }
+}
