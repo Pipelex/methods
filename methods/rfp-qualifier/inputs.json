@@ -1,0 +1,14 @@
+{
+  "rfp": {
+    "concept": "native.Document",
+    "content": {
+      "url": "https://mock-d1ed8df6.invalid/69f3e2e8-a1f3-4893-8f36-a5cb6186f8f4"
+    }
+  },
+  "capabilities": {
+    "concept": "native.Document",
+    "content": {
+      "url": "https://mock-4599a674.invalid/57371af0-da48-415e-a7ab-1348609c7313"
+    }
+  }
+}
