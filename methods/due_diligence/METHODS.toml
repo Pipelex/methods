@@ -1,5 +1,5 @@
 [package]
-name = "due-diligence"
+name = "due_diligence"
 display_name = "Due Diligence Analyzer"
 address = "github.com/pipelex/methods"
 version = "0.1.1"

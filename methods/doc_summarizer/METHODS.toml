@@ -1,5 +1,5 @@
 [package]
-name = "doc-summarizer"
+name = "doc_summarizer"
 display_name = "Document Summarizer"
 address = "github.com/pipelex/methods"
 version = "0.1.1"

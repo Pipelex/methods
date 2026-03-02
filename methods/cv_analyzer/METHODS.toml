@@ -1,5 +1,5 @@
 [package]
-name = "cv-analyzer"
+name = "cv_analyzer"
 display_name = "CV Analyzer"
 address = "github.com/pipelex/methods"
 version = "0.0.2"

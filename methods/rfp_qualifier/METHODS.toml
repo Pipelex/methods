@@ -1,5 +1,5 @@
 [package]
-name = "rfp-qualifier"
+name = "rfp_qualifier"
 display_name = "RFP Qualifier"
 address = "github.com/pipelex/methods"
 version = "0.1.1"

@@ -1,5 +1,5 @@
 [package]
-name = "key-fact-extractor"
+name = "key_fact_extractor"
 display_name = "Key Fact Extractor"
 address = "github.com/pipelex/methods"
 version = "0.1.1"

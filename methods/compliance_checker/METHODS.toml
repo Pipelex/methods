@@ -1,5 +1,5 @@
 [package]
-name = "compliance-checker"
+name = "compliance_checker"
 display_name = "Compliance Checker"
 address = "github.com/pipelex/methods"
 version = "0.1.1"

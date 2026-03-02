@@ -1,5 +1,5 @@
 [package]
-name = "report-writer"
+name = "report_writer"
 display_name = "Report Writer"
 address = "github.com/pipelex/methods"
 version = "0.1.1"

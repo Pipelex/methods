@@ -1,5 +1,5 @@
 [package]
-name = "entity-extractor"
+name = "entity_extractor"
 display_name = "Entity Extractor"
 address = "github.com/pipelex/methods"
 version = "0.1.1"

@@ -1,5 +1,5 @@
 [package]
-name = "doc-comparator"
+name = "doc_comparator"
 display_name = "Document Comparator"
 address = "github.com/pipelex/methods"
 version = "0.1.1"
