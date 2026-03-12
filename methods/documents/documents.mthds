@@ -1,6 +1,13 @@
 domain      = "documents"
 description = "The domain of documents made of pages that contain text and images"
 
+[pipe.extract_document]
+type        = "PipeExtract"
+description = "Extract text content from a document"
+inputs      = { document = "Document" }
+output      = "Page[]"
+model       = "@default-extract-document"
+
 [pipe.extract_markdown_pages]
 type            = "PipeExtract"
 description     = "Extract page text markdown from a document"
@@ -25,10 +32,3 @@ inputs          = { document = "Document" }
 output          = "Page[]"
 max_page_images = 5
 page_views      = true
-
-[pipe.extract_document]
-type        = "PipeExtract"
-description = "Extract text content from a document"
-inputs      = { document = "Document" }
-output      = "Page[]"
-model       = "@default-extract-document"

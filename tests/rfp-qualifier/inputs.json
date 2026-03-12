@@ -1,0 +1,16 @@
+{
+  "rfp": {
+    "concept": "native.Document",
+    "content": {
+      "url": "inputs/acme_rfp_cloud_migration.pdf",
+      "mime_type": "application/pdf"
+    }
+  },
+  "capabilities": {
+    "concept": "native.Document",
+    "content": {
+      "url": "inputs/acme_capabilities.pdf",
+      "mime_type": "application/pdf"
+    }
+  }
+}

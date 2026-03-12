@@ -1,0 +1,16 @@
+{
+  "cv": {
+    "concept": "native.Document",
+    "content": {
+      "url": "inputs/acme_cv_software_engineer.pdf",
+      "mime_type": "application/pdf"
+    }
+  },
+  "job_offer": {
+    "concept": "native.Document",
+    "content": {
+      "url": "inputs/acme_job_offer_engineer.pdf",
+      "mime_type": "application/pdf"
+    }
+  }
+}

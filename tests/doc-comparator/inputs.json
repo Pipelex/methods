@@ -1,0 +1,16 @@
+{
+  "document_a": {
+    "concept": "native.Document",
+    "content": {
+      "url": "inputs/synthetic_contract.pdf",
+      "mime_type": "application/pdf"
+    }
+  },
+  "document_b": {
+    "concept": "native.Document",
+    "content": {
+      "url": "inputs/acme_contract_v2.pdf",
+      "mime_type": "application/pdf"
+    }
+  }
+}
