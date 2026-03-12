@@ -37,9 +37,24 @@ severity = { type = "text", description = "Severity of non-compliance", required
   "advisory",
 ] }
 
-# ---------------------------------------------------------------------------
-# Pipes — Analysis
-# ---------------------------------------------------------------------------
+[pipe.check_compliance]
+type = "PipeSequence"
+description = "End-to-end compliance checking: extract the document, then check each rule individually via batch processing."
+inputs = { document = "Document", rules = "Rule[]" }
+output = "ComplianceResult[]"
+steps = [
+  { pipe = "github.com/Pipelex/methods/documents->documents.extract_text_pages", result = "pages" },
+  { pipe = "check_all_rules", result = "results" },
+]
+
+[pipe.check_all_rules]
+type             = "PipeBatch"
+description      = "Check every compliance rule against the document."
+inputs           = { rules = "Rule[]", pages = "Page[]" }
+output           = "ComplianceResult[]"
+branch_pipe_code = "check_single_rule"
+input_list_name  = "rules"
+input_item_name  = "rule"
 
 [pipe.check_single_rule]
 type = "PipeLLM"
@@ -69,22 +84,3 @@ Rule: $rule.rule_text
 ## Document Content
 @pages
 """
-
-[pipe.check_all_rules]
-type             = "PipeBatch"
-description      = "Check every compliance rule against the document."
-inputs           = { rules = "Rule[]", pages = "Page[]" }
-output           = "ComplianceResult[]"
-branch_pipe_code = "check_single_rule"
-input_list_name  = "rules"
-input_item_name  = "rule"
-
-[pipe.check_compliance]
-type = "PipeSequence"
-description = "End-to-end compliance checking: extract the document, then check each rule individually via batch processing."
-inputs = { document = "Document", rules = "Rule[]" }
-output = "ComplianceResult[]"
-steps = [
-  { pipe = "github.com/Pipelex/methods/documents->documents.extract_text_pages", result = "pages" },
-  { pipe = "check_all_rules", result = "results" },
-]

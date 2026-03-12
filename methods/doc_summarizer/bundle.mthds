@@ -83,9 +83,31 @@ open_questions = { type = "list", description = "Questions left unanswered or am
 audience = "The intended audience of the document"
 word_count_estimate = { type = "integer", description = "Estimated word count of the original document" }
 
+[pipe.summarize_document]
+type = "PipeSequence"
+description = "Deep document summarization: extract content, then profile structure and extract key points in parallel, then synthesize into a comprehensive summary with themes and open questions."
+inputs = { document = "Document" }
+output = "Summary"
+steps = [
+  { pipe = "github.com/Pipelex/methods/documents->documents.extract_text_pages", result = "pages" },
+  { pipe = "analyze_in_parallel", result = "analysis" },
+  { pipe = "synthesize_summary", result = "summary" },
+]
+
 # ---------------------------------------------------------------------------
 # Pipes — Parallel Analysis
 # ---------------------------------------------------------------------------
+
+[pipe.analyze_in_parallel]
+type = "PipeParallel"
+description = "Run document profiling and key point extraction in parallel."
+inputs = { pages = "Page[]" }
+output = "Anything"
+add_each_output = true
+branches = [
+  { pipe = "profile_document", result = "profile" },
+  { pipe = "extract_key_points", result = "key_points" },
+]
 
 [pipe.profile_document]
 type = "PipeLLM"
@@ -140,17 +162,6 @@ Extract all key points from the following document.
 @pages
 """
 
-[pipe.analyze_in_parallel]
-type = "PipeParallel"
-description = "Run document profiling and key point extraction in parallel."
-inputs = { pages = "Page[]" }
-output = "Anything"
-add_each_output = true
-branches = [
-  { pipe = "profile_document", result = "profile" },
-  { pipe = "extract_key_points", result = "key_points" },
-]
-
 [pipe.synthesize_summary]
 type = "PipeLLM"
 description = "Synthesize the document profile and extracted key points into a comprehensive structured summary."
@@ -190,14 +201,3 @@ Audience: $profile.audience
 ## Original Document (for reference)
 @pages
 """
-
-[pipe.summarize_document]
-type = "PipeSequence"
-description = "Deep document summarization: extract content, then profile structure and extract key points in parallel, then synthesize into a comprehensive summary with themes and open questions."
-inputs = { document = "Document" }
-output = "Summary"
-steps = [
-  { pipe = "github.com/Pipelex/methods/documents->documents.extract_text_pages", result = "pages" },
-  { pipe = "analyze_in_parallel", result = "analysis" },
-  { pipe = "synthesize_summary", result = "summary" },
-]

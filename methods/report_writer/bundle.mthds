@@ -43,6 +43,16 @@ conclusion        = { type = "text", description = "Final conclusion and recomme
 description = "A formatted report generated from structured findings, ready for human consumption."
 refines     = "Text"
 
+[pipe.write_report]
+type = "PipeSequence"
+description = "End-to-end report generation: analyze raw JSON findings into a structured outline, then compose the final formatted report using templating."
+inputs = { findings = "JSON", config = "ReportConfig" }
+output = "Report"
+steps = [
+  { pipe = "analyze_findings", result = "structure" },
+  { pipe = "compose_report", result = "report" },
+]
+
 [pipe.analyze_findings]
 type = "PipeLLM"
 description = "Analyze raw JSON findings and produce a structured report outline with title, executive summary, sections, key metrics, and conclusion."
@@ -106,13 +116,3 @@ $structure.conclusion
 ---
 *Report format: $config.format | Audience: $config.audience | Tone: $config.tone*
 """
-
-[pipe.write_report]
-type = "PipeSequence"
-description = "End-to-end report generation: analyze raw JSON findings into a structured outline, then compose the final formatted report using templating."
-inputs = { findings = "JSON", config = "ReportConfig" }
-output = "Report"
-steps = [
-  { pipe = "analyze_findings", result = "structure" },
-  { pipe = "compose_report", result = "report" },
-]

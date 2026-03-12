@@ -73,9 +73,33 @@ strategic_considerations = "Strategic factors beyond requirement matching: relat
 description = "An executive summary recommending whether to bid and outlining the key decision factors."
 refines     = "Text"
 
+[pipe.qualify_rfp]
+type = "PipeSequence"
+description = "End-to-end RFP qualification pipeline: extract documents, parse requirements, assess each against capabilities, build a qualification matrix, and generate an executive summary."
+inputs = { rfp = "Document", capabilities = "Document" }
+output = "BidSummary"
+steps = [
+  { pipe = "extract_documents", result = "all_pages" },
+  { pipe = "parse_requirements", result = "requirements" },
+  { pipe = "assess_all_requirements", result = "capability_matches" },
+  { pipe = "build_qualification_matrix", result = "qualification_matrix" },
+  { pipe = "generate_executive_summary", result = "executive_summary" },
+]
+
 # ---------------------------------------------------------------------------
 # Pipes — Extraction
 # ---------------------------------------------------------------------------
+
+[pipe.extract_documents]
+type = "PipeParallel"
+description = "Extract both the RFP and capabilities documents concurrently."
+inputs = { rfp = "Document", capabilities = "Document" }
+output = "Page[]"
+add_each_output = true
+branches = [
+  { pipe = "extract_rfp", result = "rfp_pages" },
+  { pipe = "extract_capabilities", result = "capabilities_pages" },
+]
 
 [pipe.extract_rfp]
 type        = "PipeExtract"
@@ -90,17 +114,6 @@ description = "Extract text content from the company capabilities document."
 inputs      = { capabilities = "Document" }
 output      = "Page[]"
 model       = "@default-extract-document"
-
-[pipe.extract_documents]
-type = "PipeParallel"
-description = "Extract both the RFP and capabilities documents concurrently."
-inputs = { rfp = "Document", capabilities = "Document" }
-output = "Page[]"
-add_each_output = true
-branches = [
-  { pipe = "extract_rfp", result = "rfp_pages" },
-  { pipe = "extract_capabilities", result = "capabilities_pages" },
-]
 
 # ---------------------------------------------------------------------------
 # Pipes — Analysis
@@ -122,6 +135,15 @@ Analyze the following RFP document and extract every individual requirement. For
 
 @rfp_pages
 """
+
+[pipe.assess_all_requirements]
+type             = "PipeBatch"
+description      = "Assess every RFP requirement against the companys capabilities."
+inputs           = { requirements = "RFPRequirement[]", capabilities_pages = "Page[]" }
+output           = "CapabilityMatch[]"
+branch_pipe_code = "assess_single_requirement"
+input_list_name  = "requirements"
+input_item_name  = "requirement"
 
 [pipe.assess_single_requirement]
 type = "PipeLLM"
@@ -151,15 +173,6 @@ Description: $requirement.description
 ## Company Capabilities
 @capabilities_pages
 """
-
-[pipe.assess_all_requirements]
-type             = "PipeBatch"
-description      = "Assess every RFP requirement against the companys capabilities."
-inputs           = { requirements = "RFPRequirement[]", capabilities_pages = "Page[]" }
-output           = "CapabilityMatch[]"
-branch_pipe_code = "assess_single_requirement"
-input_list_name  = "requirements"
-input_item_name  = "requirement"
 
 [pipe.build_qualification_matrix]
 type = "PipeLLM"
@@ -219,16 +232,3 @@ Strategic considerations: $qualification_matrix.strategic_considerations
 ## Original RFP
 @rfp_pages
 """
-
-[pipe.qualify_rfp]
-type = "PipeSequence"
-description = "End-to-end RFP qualification pipeline: extract documents, parse requirements, assess each against capabilities, build a qualification matrix, and generate an executive summary."
-inputs = { rfp = "Document", capabilities = "Document" }
-output = "BidSummary"
-steps = [
-  { pipe = "extract_documents", result = "all_pages" },
-  { pipe = "parse_requirements", result = "requirements" },
-  { pipe = "assess_all_requirements", result = "capability_matches" },
-  { pipe = "build_qualification_matrix", result = "qualification_matrix" },
-  { pipe = "generate_executive_summary", result = "executive_summary" },
-]

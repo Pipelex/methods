@@ -24,6 +24,16 @@ change_type = { type = "text", description = "Nature of the relationship between
 ] }
 notable_gaps = { type = "list", description = "Topics covered in one document but absent from the other", required = true }
 
+[pipe.compare_documents]
+type = "PipeSequence"
+description = "End-to-end document comparison: extract both documents, concatenate each into text, then analyze their similarities, differences, and alignment."
+inputs = { documents = "Document[]" }
+output = "Comparison"
+steps = [
+  { pipe = "extract_both", result = "documents_texts" },
+  { pipe = "analyze_comparison", result = "comparison" },
+]
+
 [pipe.extract_both]
 type             = "PipeBatch"
 description      = "Extract both documents and concatenate each into a single Text."
@@ -57,13 +67,3 @@ Compare the following two documents.
 
 @documents_texts
 """
-
-[pipe.compare_documents]
-type = "PipeSequence"
-description = "End-to-end document comparison: extract both documents, concatenate each into text, then analyze their similarities, differences, and alignment."
-inputs = { documents = "Document[]" }
-output = "Comparison"
-steps = [
-  { pipe = "extract_both", result = "documents_texts" },
-  { pipe = "analyze_comparison", result = "comparison" },
-]

@@ -24,6 +24,16 @@ confidence = { type = "text", description = "Confidence that this is a factual c
   "low",
 ] }
 
+[pipe.extract_facts]
+type = "PipeSequence"
+description = "End-to-end fact extraction: extract document content, then identify all key facts and claims."
+inputs = { document = "Document" }
+output = "Fact[]"
+steps = [
+  { pipe = "github.com/Pipelex/methods/documents->documents.extract_text_pages", result = "pages" },
+  { pipe = "identify_facts", result = "facts" },
+]
+
 [pipe.identify_facts]
 type = "PipeLLM"
 description = "Identify and extract all key facts and claims from the document pages."
@@ -47,13 +57,3 @@ Extract all key facts and claims from the following document.
 
 @pages
 """
-
-[pipe.extract_facts]
-type = "PipeSequence"
-description = "End-to-end fact extraction: extract document content, then identify all key facts and claims."
-inputs = { document = "Document" }
-output = "Fact[]"
-steps = [
-  { pipe = "github.com/Pipelex/methods/documents->documents.extract_text_pages", result = "pages" },
-  { pipe = "identify_facts", result = "facts" },
-]

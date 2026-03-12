@@ -20,6 +20,16 @@ entity_type = { type = "text", description = "Type of entity", required = true, 
 context = { type = "text", description = "The surrounding sentence or phrase where the entity was found", required = true }
 normalized_value = "Normalized or canonical form of the entity (e.g. ISO date, full org name)"
 
+[pipe.extract_entities]
+type = "PipeSequence"
+description = "End-to-end entity extraction: extract document content, then identify all named entities."
+inputs = { document = "Document" }
+output = "Entity[]"
+steps = [
+  { pipe = "github.com/Pipelex/methods/documents->documents.extract_text_pages", result = "pages" },
+  { pipe = "identify_entities", result = "entities" },
+]
+
 [pipe.identify_entities]
 type = "PipeLLM"
 description = "Identify and extract all named entities from the document pages."
@@ -42,13 +52,3 @@ Extract all named entities from the following document.
 
 @pages
 """
-
-[pipe.extract_entities]
-type = "PipeSequence"
-description = "End-to-end entity extraction: extract document content, then identify all named entities."
-inputs = { document = "Document" }
-output = "Entity[]"
-steps = [
-  { pipe = "github.com/Pipelex/methods/documents->documents.extract_text_pages", result = "pages" },
-  { pipe = "identify_entities", result = "entities" },
-]
