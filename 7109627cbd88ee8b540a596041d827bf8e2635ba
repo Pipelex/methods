@@ -1,0 +1,46 @@
+methods/rfp_qualifier/inputs/rfp.pdf
+  845e8d113e2a924a 1-93
+methods/documents/METHODS.toml
+  845e8d113e2a924a 17
+methods/due_diligence/inputs/org_chart.pdf
+  845e8d113e2a924a 1-99
+methods/due_diligence/inputs/contracts.pdf
+  845e8d113e2a924a 1-93
+methods/due_diligence/inputs/financial_statements.pdf
+  845e8d113e2a924a 1-99
+methods/rfp_qualifier/inputs/capabilities.pdf
+  845e8d113e2a924a 1-112
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.10",
+  "base_commit_sha": "7109627cbd88ee8b540a596041d827bf8e2635ba",
+  "prompts": {
+    "845e8d113e2a924a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cf2cf45b-d909-461f-a7d8-b71a8bd916e5",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Louis Choquel <lchoquel@users.noreply.github.com>",
+      "messages": [],
+      "total_additions": 9425,
+      "total_deletions": 68,
+      "accepted_lines": 497,
+      "overriden_lines": 0
+    },
+    "874a49201aed0b6f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8dff84b7-b373-4350-9476-13563721e806",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Louis Choquel <lchoquel@users.noreply.github.com>",
+      "messages": [],
+      "total_additions": 496,
+      "total_deletions": 0,
+      "accepted_lines": 0,
+      "overriden_lines": 0
+    }
+  }
+}
