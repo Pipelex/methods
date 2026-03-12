@@ -1,0 +1,41 @@
+methods/due_diligence/report.mthds
+  845e8d113e2a924a 35
+methods/key_fact_extractor/bundle.mthds
+  845e8d113e2a924a 36
+methods/entity_extractor/bundle.mthds
+  845e8d113e2a924a 32
+methods/due_diligence/analysis.mthds
+  845e8d113e2a924a 84-95,120-121,123-125,128-130
+methods/rfp_qualifier/bundle.mthds
+  845e8d113e2a924a 88
+methods/doc_summarizer/bundle.mthds
+  845e8d113e2a924a 96
+methods/doc_comparator/bundle.mthds
+  845e8d113e2a924a 36
+methods/compliance_checker/bundle.mthds
+  845e8d113e2a924a 49
+methods/report_writer/bundle.mthds
+  845e8d113e2a924a 55
+methods/documents/documents.mthds
+  845e8d113e2a924a 30,39
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.10",
+  "base_commit_sha": "b624200258cf5919fa3399455ee9dd83c9e65150",
+  "prompts": {
+    "845e8d113e2a924a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cf2cf45b-d909-461f-a7d8-b71a8bd916e5",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Louis Choquel <lchoquel@users.noreply.github.com>",
+      "messages": [],
+      "total_additions": 170,
+      "total_deletions": 174,
+      "accepted_lines": 34,
+      "overriden_lines": 0
+    }
+  }
+}
