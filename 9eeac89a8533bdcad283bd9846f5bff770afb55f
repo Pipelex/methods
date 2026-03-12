@@ -1,0 +1,46 @@
+methods/documents/documents.mthds
+  bc7a175d5b5b1946 28-34
+methods/doc-summarizer/bundle.mthds
+  bc7a175d5b5b1946 212
+methods/documents/METHODS.toml
+  bc7a175d5b5b1946 14
+methods/compliance-checker/bundle.mthds
+  bc7a175d5b5b1946 96
+methods/entity-extractor/bundle.mthds
+  9d7e0c02d7cffd02 56
+methods/key-fact-extractor/bundle.mthds
+  9d7e0c02d7cffd02 61
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.10",
+  "base_commit_sha": "9eeac89a8533bdcad283bd9846f5bff770afb55f",
+  "prompts": {
+    "9d7e0c02d7cffd02": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4fceb40e-186e-4293-ba7c-6a05235ab280",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Louis Choquel <lchoquel@users.noreply.github.com>",
+      "messages": [],
+      "total_additions": 2,
+      "total_deletions": 16,
+      "accepted_lines": 2,
+      "overriden_lines": 0
+    },
+    "bc7a175d5b5b1946": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "aa44cc43-0aee-4b1b-899b-33c436f09671",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Louis Choquel <lchoquel@users.noreply.github.com>",
+      "messages": [],
+      "total_additions": 10,
+      "total_deletions": 16,
+      "accepted_lines": 10,
+      "overriden_lines": 0
+    }
+  }
+}
