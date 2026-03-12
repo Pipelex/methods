@@ -24,10 +24,6 @@ change_type = { type = "text", description = "Nature of the relationship between
 ] }
 notable_gaps = { type = "list", description = "Topics covered in one document but absent from the other", required = true }
 
-# ---------------------------------------------------------------------------
-# Pipes — Extraction
-# ---------------------------------------------------------------------------
-
 [pipe.extract_both]
 type             = "PipeBatch"
 description      = "Extract both documents and concatenate each into a single Text."
@@ -36,10 +32,6 @@ output           = "Text[]"
 branch_pipe_code = "github.com/Pipelex/methods/documents->documents.extract_document_text"
 input_list_name  = "documents"
 input_item_name  = "document"
-
-# ---------------------------------------------------------------------------
-# Pipes — Analysis
-# ---------------------------------------------------------------------------
 
 [pipe.analyze_comparison]
 type = "PipeLLM"
@@ -65,10 +57,6 @@ Compare the following two documents.
 
 @documents_texts
 """
-
-# ---------------------------------------------------------------------------
-# Pipes — Main Pipeline
-# ---------------------------------------------------------------------------
 
 [pipe.compare_documents]
 type = "PipeSequence"

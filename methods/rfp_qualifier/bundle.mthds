@@ -188,10 +188,6 @@ Based on the following individual requirement assessments and the original RFP, 
 @capability_matches
 """
 
-# ---------------------------------------------------------------------------
-# Pipes — Synthesis
-# ---------------------------------------------------------------------------
-
 [pipe.generate_executive_summary]
 type = "PipeLLM"
 description = "Generate an executive summary that synthesizes the qualification matrix into an actionable recommendation for leadership."
@@ -223,10 +219,6 @@ Strategic considerations: $qualification_matrix.strategic_considerations
 ## Original RFP
 @rfp_pages
 """
-
-# ---------------------------------------------------------------------------
-# Pipes — Main Pipeline
-# ---------------------------------------------------------------------------
 
 [pipe.qualify_rfp]
 type = "PipeSequence"

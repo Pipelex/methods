@@ -43,10 +43,6 @@ conclusion        = { type = "text", description = "Final conclusion and recomme
 description = "A formatted report generated from structured findings, ready for human consumption."
 refines     = "Text"
 
-# ---------------------------------------------------------------------------
-# Pipes — Analysis
-# ---------------------------------------------------------------------------
-
 [pipe.analyze_findings]
 type = "PipeLLM"
 description = "Analyze raw JSON findings and produce a structured report outline with title, executive summary, sections, key metrics, and conclusion."
@@ -84,10 +80,6 @@ Max length: $config.max_length
 @findings
 """
 
-# ---------------------------------------------------------------------------
-# Pipes — Composition
-# ---------------------------------------------------------------------------
-
 [pipe.compose_report]
 type = "PipeCompose"
 description = "Compose the final formatted report from the structured analysis using templating."
@@ -114,10 +106,6 @@ $structure.conclusion
 ---
 *Report format: $config.format | Audience: $config.audience | Tone: $config.tone*
 """
-
-# ---------------------------------------------------------------------------
-# Pipes — Main Pipeline
-# ---------------------------------------------------------------------------
 
 [pipe.write_report]
 type = "PipeSequence"

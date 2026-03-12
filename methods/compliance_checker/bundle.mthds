@@ -79,10 +79,6 @@ branch_pipe_code = "check_single_rule"
 input_list_name  = "rules"
 input_item_name  = "rule"
 
-# ---------------------------------------------------------------------------
-# Pipes — Main Pipeline
-# ---------------------------------------------------------------------------
-
 [pipe.check_compliance]
 type = "PipeSequence"
 description = "End-to-end compliance checking: extract the document, then check each rule individually via batch processing."

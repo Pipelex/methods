@@ -20,10 +20,6 @@ entity_type = { type = "text", description = "Type of entity", required = true, 
 context = { type = "text", description = "The surrounding sentence or phrase where the entity was found", required = true }
 normalized_value = "Normalized or canonical form of the entity (e.g. ISO date, full org name)"
 
-# ---------------------------------------------------------------------------
-# Pipes
-# ---------------------------------------------------------------------------
-
 [pipe.identify_entities]
 type = "PipeLLM"
 description = "Identify and extract all named entities from the document pages."

@@ -24,10 +24,6 @@ confidence = { type = "text", description = "Confidence that this is a factual c
   "low",
 ] }
 
-# ---------------------------------------------------------------------------
-# Pipes
-# ---------------------------------------------------------------------------
-
 [pipe.identify_facts]
 type = "PipeLLM"
 description = "Identify and extract all key facts and claims from the document pages."

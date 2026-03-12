@@ -84,10 +84,6 @@ audience = "The intended audience of the document"
 word_count_estimate = { type = "integer", description = "Estimated word count of the original document" }
 
 # ---------------------------------------------------------------------------
-# Pipes — Extraction
-# ---------------------------------------------------------------------------
-
-# ---------------------------------------------------------------------------
 # Pipes — Parallel Analysis
 # ---------------------------------------------------------------------------
 
@@ -155,10 +151,6 @@ branches = [
   { pipe = "extract_key_points", result = "key_points" },
 ]
 
-# ---------------------------------------------------------------------------
-# Pipes — Synthesis
-# ---------------------------------------------------------------------------
-
 [pipe.synthesize_summary]
 type = "PipeLLM"
 description = "Synthesize the document profile and extracted key points into a comprehensive structured summary."
@@ -198,10 +190,6 @@ Audience: $profile.audience
 ## Original Document (for reference)
 @pages
 """
-
-# ---------------------------------------------------------------------------
-# Pipes — Main Pipeline
-# ---------------------------------------------------------------------------
 
 [pipe.summarize_document]
 type = "PipeSequence"
