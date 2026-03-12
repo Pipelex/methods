@@ -1,0 +1,40 @@
+tests/generate_test_inputs.py
+  874a49201aed0b6f 1-1201
+tests/entity-extractor/inputs.json
+  6f96798974755816 1-9
+tests/entity-extractor/inputs/synthetic_contract.pdf
+  874a49201aed0b6f 1-112
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.10",
+  "base_commit_sha": "cf94e79e76345ce2090c4ecf6ea5ec611fe676e5",
+  "prompts": {
+    "6f96798974755816": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3d680a39-b898-4caa-acfd-63afeef37caa",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Louis Choquel <lchoquel@users.noreply.github.com>",
+      "messages": [],
+      "total_additions": 121,
+      "total_deletions": 0,
+      "accepted_lines": 9,
+      "overriden_lines": 0
+    },
+    "874a49201aed0b6f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8dff84b7-b373-4350-9476-13563721e806",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Louis Choquel <lchoquel@users.noreply.github.com>",
+      "messages": [],
+      "total_additions": 1313,
+      "total_deletions": 0,
+      "accepted_lines": 1313,
+      "overriden_lines": 0
+    }
+  }
+}
