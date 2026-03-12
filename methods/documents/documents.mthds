@@ -25,3 +25,10 @@ inputs          = { document = "Document" }
 output          = "Page[]"
 max_page_images = 5
 page_views      = true
+
+[pipe.extract_document]
+type        = "PipeExtract"
+description = "Extract text content from a document"
+inputs      = { document = "Document" }
+output      = "Page[]"
+model       = "@default-extract-document"

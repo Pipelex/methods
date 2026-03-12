@@ -11,4 +11,5 @@ pipes = [
   "extract_markdown_pages",
   "extract_page_contents",
   "extract_page_contents_and_views",
+  "extract_document",
 ]
