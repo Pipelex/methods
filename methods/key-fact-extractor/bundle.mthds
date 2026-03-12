@@ -58,6 +58,6 @@ description = "End-to-end fact extraction: extract document content, then identi
 inputs = { document = "Document" }
 output = "Fact[]"
 steps = [
-  { pipe = "github.com/Pipelex/methods/documents->documents.extract_document", result = "pages" },
+  { pipe = "github.com/Pipelex/methods/documents->documents.extract_text_pages", result = "pages" },
   { pipe = "identify_facts", result = "facts" },
 ]

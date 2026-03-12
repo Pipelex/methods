@@ -209,7 +209,7 @@ description = "Deep document summarization: extract content, then profile struct
 inputs = { document = "Document" }
 output = "Summary"
 steps = [
-  { pipe = "github.com/Pipelex/methods/documents->documents.extract_document", result = "pages" },
+  { pipe = "github.com/Pipelex/methods/documents->documents.extract_text_pages", result = "pages" },
   { pipe = "analyze_in_parallel", result = "analysis" },
   { pipe = "synthesize_summary", result = "summary" },
 ]

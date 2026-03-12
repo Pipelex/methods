@@ -53,6 +53,6 @@ description = "End-to-end entity extraction: extract document content, then iden
 inputs = { document = "Document" }
 output = "Entity[]"
 steps = [
-  { pipe = "github.com/Pipelex/methods/documents->documents.extract_document", result = "pages" },
+  { pipe = "github.com/Pipelex/methods/documents->documents.extract_text_pages", result = "pages" },
   { pipe = "identify_entities", result = "entities" },
 ]

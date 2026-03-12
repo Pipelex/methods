@@ -1119,8 +1119,13 @@ def write_doc_comparator_inputs() -> None:
     write_json(
         os.path.join(d, "inputs.json"),
         {
-            "document_a": document_input("synthetic_contract.pdf"),
-            "document_b": document_input("acme_contract_v2.pdf"),
+            "documents": {
+                "concept": "native.Document[]",
+                "content": [
+                    {"url": "inputs/synthetic_contract.pdf", "mime_type": "application/pdf"},
+                    {"url": "inputs/acme_contract_v2.pdf", "mime_type": "application/pdf"},
+                ],
+            },
         },
     )
 
