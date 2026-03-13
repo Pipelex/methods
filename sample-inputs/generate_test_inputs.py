@@ -5,7 +5,7 @@ Theme: "Evotis S.A.S evaluating the acquisition of Acme Corp"
 All documents form a coherent scenario around this M&A deal.
 
 Usage:
-    python tests/generate_test_inputs.py
+    python sample-inputs/generate_test_inputs.py
 """
 
 import json
@@ -24,9 +24,9 @@ from reportlab.platypus import (
     TableStyle,
 )
 
-TESTS_DIR = os.path.dirname(os.path.abspath(__file__))
+SAMPLE_INPUTS_DIR = os.path.dirname(os.path.abspath(__file__))
 EXISTING_CONTRACT = os.path.join(
-    TESTS_DIR, "entity-extractor", "inputs", "synthetic_contract.pdf"
+    SAMPLE_INPUTS_DIR, "entity-extractor", "inputs", "synthetic_contract.pdf"
 )
 
 styles = getSampleStyleSheet()
@@ -45,7 +45,7 @@ def build_pdf(path: str, story: list) -> None:
     ensure_dir(os.path.dirname(path))
     doc = SimpleDocTemplate(path, pagesize=A4, topMargin=2 * cm, bottomMargin=2 * cm)
     doc.build(story)
-    print(f"  Generated: {os.path.relpath(path, TESTS_DIR)}")
+    print(f"  Generated: {os.path.relpath(path, SAMPLE_INPUTS_DIR)}")
 
 
 def write_json(path: str, data: dict) -> None:
@@ -53,14 +53,14 @@ def write_json(path: str, data: dict) -> None:
     with open(path, "w") as f:
         json.dump(data, f, indent=2)
         f.write("\n")
-    print(f"  Generated: {os.path.relpath(path, TESTS_DIR)}")
+    print(f"  Generated: {os.path.relpath(path, SAMPLE_INPUTS_DIR)}")
 
 
 def copy_contract(dest_dir: str) -> None:
     dest = os.path.join(dest_dir, "synthetic_contract.pdf")
     ensure_dir(dest_dir)
     shutil.copy2(EXISTING_CONTRACT, dest)
-    print(f"  Copied:    {os.path.relpath(dest, TESTS_DIR)}")
+    print(f"  Copied:    {os.path.relpath(dest, SAMPLE_INPUTS_DIR)}")
 
 
 def document_input(filename: str) -> dict:
@@ -104,7 +104,7 @@ def make_table(data: list[list[str]], col_widths: list[float] | None = None) -> 
 
 def generate_acme_contract_v2() -> str:
     """Revised contract — modified payment terms, added SLA, updated liability."""
-    path = os.path.join(TESTS_DIR, "doc-comparator", "inputs", "acme_contract_v2.pdf")
+    path = os.path.join(SAMPLE_INPUTS_DIR, "doc-comparator", "inputs", "acme_contract_v2.pdf")
     story = [
         Paragraph("MASTER SERVICES AGREEMENT", TITLE),
         Paragraph("(Revised Version — Effective March 1, 2026)", BODY),
@@ -238,7 +238,7 @@ def generate_acme_contract_v2() -> str:
 
 def generate_cv() -> str:
     """CV for Marie Dupont — senior software engineer."""
-    path = os.path.join(TESTS_DIR, "cv-analyzer", "inputs", "acme_cv_software_engineer.pdf")
+    path = os.path.join(SAMPLE_INPUTS_DIR, "cv-analyzer", "inputs", "acme_cv_software_engineer.pdf")
     story = [
         Paragraph("MARIE DUPONT", TITLE),
         Paragraph("Senior Software Engineer", H2),
@@ -326,7 +326,7 @@ def generate_cv() -> str:
 
 def generate_job_offer() -> str:
     """Job posting for Senior Backend Engineer at Acme Corp."""
-    path = os.path.join(TESTS_DIR, "cv-analyzer", "inputs", "acme_job_offer_engineer.pdf")
+    path = os.path.join(SAMPLE_INPUTS_DIR, "cv-analyzer", "inputs", "acme_job_offer_engineer.pdf")
     story = [
         Paragraph("JOB OFFER", TITLE),
         Paragraph("Senior Backend Engineer — Acme Corp", H2),
@@ -410,7 +410,7 @@ def generate_job_offer() -> str:
 
 def generate_rfp() -> str:
     """RFP from EuroBank AG for cloud migration."""
-    path = os.path.join(TESTS_DIR, "rfp-qualifier", "inputs", "acme_rfp_cloud_migration.pdf")
+    path = os.path.join(SAMPLE_INPUTS_DIR, "rfp-qualifier", "inputs", "acme_rfp_cloud_migration.pdf")
     story = [
         Paragraph("REQUEST FOR PROPOSAL", TITLE),
         Paragraph("Cloud Infrastructure Migration Services", H2),
@@ -525,7 +525,7 @@ def generate_rfp() -> str:
 
 def generate_capabilities() -> str:
     """Acme Corp capabilities document — partial match for the RFP."""
-    path = os.path.join(TESTS_DIR, "rfp-qualifier", "inputs", "acme_capabilities.pdf")
+    path = os.path.join(SAMPLE_INPUTS_DIR, "rfp-qualifier", "inputs", "acme_capabilities.pdf")
     story = [
         Paragraph("ACME CORP — COMPANY CAPABILITIES", TITLE),
         Paragraph("Cloud Migration & Managed Infrastructure Services", H2),
@@ -638,7 +638,7 @@ def generate_capabilities() -> str:
 
 def generate_financial_statements() -> str:
     """Acme Corp FY2024-2025 financial statements."""
-    path = os.path.join(TESTS_DIR, "due-diligence", "inputs", "acme_financial_statements.pdf")
+    path = os.path.join(SAMPLE_INPUTS_DIR, "due-diligence", "inputs", "acme_financial_statements.pdf")
     story = [
         Paragraph("ACME CORP — FINANCIAL STATEMENTS", TITLE),
         Paragraph("Fiscal Years 2024 and 2025 (Audited)", H2),
@@ -751,7 +751,7 @@ def generate_financial_statements() -> str:
 
 def generate_contracts_portfolio() -> str:
     """Acme Corp contracts portfolio with change-of-control clauses."""
-    path = os.path.join(TESTS_DIR, "due-diligence", "inputs", "acme_contracts_portfolio.pdf")
+    path = os.path.join(SAMPLE_INPUTS_DIR, "due-diligence", "inputs", "acme_contracts_portfolio.pdf")
     story = [
         Paragraph("ACME CORP — KEY CONTRACTS PORTFOLIO", TITLE),
         Paragraph("Summary of Material Contracts for Due Diligence Review", H2),
@@ -877,7 +877,7 @@ def generate_contracts_portfolio() -> str:
 
 def generate_org_chart() -> str:
     """Acme Corp organizational chart."""
-    path = os.path.join(TESTS_DIR, "due-diligence", "inputs", "acme_org_chart.pdf")
+    path = os.path.join(SAMPLE_INPUTS_DIR, "due-diligence", "inputs", "acme_org_chart.pdf")
     story = [
         Paragraph("ACME CORP — ORGANIZATIONAL STRUCTURE", TITLE),
         Paragraph("As of February 2026 | Total Headcount: 47", H2),
@@ -989,19 +989,19 @@ def generate_org_chart() -> str:
 
 
 def write_key_fact_extractor_inputs() -> None:
-    d = os.path.join(TESTS_DIR, "key-fact-extractor")
+    d = os.path.join(SAMPLE_INPUTS_DIR, "key-fact-extractor")
     copy_contract(os.path.join(d, "inputs"))
     write_json(os.path.join(d, "inputs.json"), {"document": document_input("synthetic_contract.pdf")})
 
 
 def write_doc_summarizer_inputs() -> None:
-    d = os.path.join(TESTS_DIR, "doc-summarizer")
+    d = os.path.join(SAMPLE_INPUTS_DIR, "doc-summarizer")
     copy_contract(os.path.join(d, "inputs"))
     write_json(os.path.join(d, "inputs.json"), {"document": document_input("synthetic_contract.pdf")})
 
 
 def write_compliance_checker_inputs() -> None:
-    d = os.path.join(TESTS_DIR, "compliance-checker")
+    d = os.path.join(SAMPLE_INPUTS_DIR, "compliance-checker")
     copy_contract(os.path.join(d, "inputs"))
     write_json(
         os.path.join(d, "inputs.json"),
@@ -1041,7 +1041,7 @@ def write_compliance_checker_inputs() -> None:
 
 
 def write_report_writer_inputs() -> None:
-    d = os.path.join(TESTS_DIR, "report-writer")
+    d = os.path.join(SAMPLE_INPUTS_DIR, "report-writer")
     write_json(
         os.path.join(d, "inputs.json"),
         {
@@ -1113,7 +1113,7 @@ def write_report_writer_inputs() -> None:
 
 
 def write_doc_comparator_inputs() -> None:
-    d = os.path.join(TESTS_DIR, "doc-comparator")
+    d = os.path.join(SAMPLE_INPUTS_DIR, "doc-comparator")
     copy_contract(os.path.join(d, "inputs"))
     generate_acme_contract_v2()
     write_json(
@@ -1131,7 +1131,7 @@ def write_doc_comparator_inputs() -> None:
 
 
 def write_cv_analyzer_inputs() -> None:
-    d = os.path.join(TESTS_DIR, "cv-analyzer")
+    d = os.path.join(SAMPLE_INPUTS_DIR, "cv-analyzer")
     generate_cv()
     generate_job_offer()
     write_json(
@@ -1144,7 +1144,7 @@ def write_cv_analyzer_inputs() -> None:
 
 
 def write_rfp_qualifier_inputs() -> None:
-    d = os.path.join(TESTS_DIR, "rfp-qualifier")
+    d = os.path.join(SAMPLE_INPUTS_DIR, "rfp-qualifier")
     generate_rfp()
     generate_capabilities()
     write_json(
@@ -1157,7 +1157,7 @@ def write_rfp_qualifier_inputs() -> None:
 
 
 def write_due_diligence_inputs() -> None:
-    d = os.path.join(TESTS_DIR, "due-diligence")
+    d = os.path.join(SAMPLE_INPUTS_DIR, "due-diligence")
     generate_financial_statements()
     generate_contracts_portfolio()
     generate_org_chart()
