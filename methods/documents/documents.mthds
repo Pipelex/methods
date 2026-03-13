@@ -42,7 +42,7 @@ type        = "PipeCompose"
 description = "Concatenate all pages' text into a single Text"
 inputs      = { pages = "Page[]" }
 output      = "Text"
-template    = "$pages"
+template    = "{% for page in pages %}{{ page.text_and_images.text.text }}{% if not loop.last %}\n\n{% endif %}{% endfor %}"
 
 [pipe.extract_page_contents]
 type            = "PipeExtract"
