@@ -1,0 +1,38 @@
+methods/doc_comparator/bundle.mthds
+  2517be72b3b53e94 30
+methods/doc_comparator/inputs.json
+  2517be72b3b53e94 2,7-9,15
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.10",
+  "base_commit_sha": "4aeae7d92751305bb33365d1aeec1c70bb5d1ddc",
+  "prompts": {
+    "2517be72b3b53e94": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5a85cd85-6252-4bf2-8658-5e865709fea1",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Louis Choquel <lchoquel@users.noreply.github.com>",
+      "messages": [],
+      "total_additions": 15,
+      "total_deletions": 13,
+      "accepted_lines": 6,
+      "overriden_lines": 0
+    },
+    "fb1d8a6e09aeb6a1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "419db8d9-d0ea-4200-96cd-9dff69178eb4",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Louis Choquel <lchoquel@users.noreply.github.com>",
+      "messages": [],
+      "total_additions": 81,
+      "total_deletions": 2,
+      "accepted_lines": 73,
+      "overriden_lines": 8
+    }
+  }
+}
