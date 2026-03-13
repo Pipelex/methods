@@ -8,7 +8,7 @@ inputs = { document = "Document" }
 output = "Text"
 steps = [
   { pipe = "extract_text_pages", result = "pages" },
-  { pipe = "join_pages", result = "text" },
+  { pipe = "join_texts_from_pages", result = "text" },
 ]
 
 [pipe.extract_document_markdown]
@@ -18,7 +18,7 @@ inputs = { document = "Document" }
 output = "Text"
 steps = [
   { pipe = "extract_markdown_pages", result = "pages" },
-  { pipe = "join_pages", result = "text" },
+  { pipe = "join_texts_from_pages", result = "text" },
 ]
 
 [pipe.extract_text_pages]
@@ -37,7 +37,7 @@ model           = "azure-document-intelligence"
 max_page_images = 0
 page_views      = false
 
-[pipe.join_pages]
+[pipe.join_texts_from_pages]
 type        = "PipeCompose"
 description = "Concatenate all pages' text into a single Text"
 inputs      = { pages = "Page[]" }

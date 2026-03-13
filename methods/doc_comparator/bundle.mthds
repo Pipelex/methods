@@ -27,7 +27,7 @@ notable_gaps = { type = "list", description = "Topics covered in one document bu
 [pipe.compare_documents]
 type = "PipeSequence"
 description = "End-to-end document comparison: extract both documents, concatenate each into text, then analyze their similarities, differences, and alignment."
-inputs = { documents = "Document[]" }
+inputs = { documents = "Document[2]" }
 output = "Comparison"
 steps = [
   { pipe = "extract_both", result = "documents_texts" },
