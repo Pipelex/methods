@@ -1,0 +1,75 @@
+sample-inputs/cv-analyzer/inputs/acme_cv_software_engineer.pdf
+  5c49c52976ff20ca 1-93
+sample-inputs/doc-comparator/inputs/synthetic_contract.pdf
+  5c49c52976ff20ca 1-112
+sample-inputs/generate_test_inputs.py
+  5c49c52976ff20ca 8,27,29,48,56,63,107,241,329,413,528,641,754,880,992,998,1004,1044,1116,1134,1147,1160
+sample-inputs/key-fact-extractor/inputs/synthetic_contract.pdf
+  5c49c52976ff20ca 1-112
+sample-inputs/cv-analyzer/inputs/acme_job_offer_engineer.pdf
+  5c49c52976ff20ca 1-93
+sample-inputs/due-diligence/inputs/acme_org_chart.pdf
+  5c49c52976ff20ca 1-93
+sample-inputs/rfp-qualifier/inputs/acme_capabilities.pdf
+  5c49c52976ff20ca 1-99
+sample-inputs/compliance-checker/inputs/synthetic_contract.pdf
+  5c49c52976ff20ca 1-112
+sample-inputs/due-diligence/inputs/acme_contracts_portfolio.pdf
+  5c49c52976ff20ca 1-93
+sample-inputs/doc-comparator/inputs/acme_contract_v2.pdf
+  5c49c52976ff20ca 1-93
+sample-inputs/doc-summarizer/inputs/synthetic_contract.pdf
+  5c49c52976ff20ca 1-112
+sample-inputs/due-diligence/inputs/acme_financial_statements.pdf
+  5c49c52976ff20ca 1-112
+sample-inputs/entity-extractor/inputs/synthetic_contract.pdf
+  5c49c52976ff20ca 1-112
+sample-inputs/rfp-qualifier/inputs/acme_rfp_cloud_migration.pdf
+  5c49c52976ff20ca 1-93
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.10",
+  "base_commit_sha": "9b9a1684618b75c49b9343ebc9817bf8552d003a",
+  "prompts": {
+    "5c49c52976ff20ca": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b7b41650-c33e-4637-b940-c71ab21bf286",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Louis Choquel <lchoquel@users.noreply.github.com>",
+      "messages": [],
+      "total_additions": 2680,
+      "total_deletions": 22,
+      "accepted_lines": 1351,
+      "overriden_lines": 0
+    },
+    "9142066e7f33a805": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c33c5047-9f66-4e88-91e2-f79c7e6b0269",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Louis Choquel <lchoquel@users.noreply.github.com>",
+      "messages": [],
+      "total_additions": 31,
+      "total_deletions": 1,
+      "accepted_lines": 21,
+      "overriden_lines": 8
+    },
+    "fb1d8a6e09aeb6a1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "419db8d9-d0ea-4200-96cd-9dff69178eb4",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Louis Choquel <lchoquel@users.noreply.github.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 73,
+      "overriden_lines": 0
+    }
+  }
+}
