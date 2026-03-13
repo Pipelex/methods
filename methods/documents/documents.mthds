@@ -38,11 +38,15 @@ max_page_images = 0
 page_views      = false
 
 [pipe.join_texts_from_pages]
-type        = "PipeCompose"
+type = "PipeCompose"
 description = "Concatenate all pages' text into a single Text"
-inputs      = { pages = "Page[]" }
-output      = "Text"
-template    = "$pages"
+inputs = { pages = "Page[]" }
+output = "Text"
+template = """
+{% for page in pages %}{{ page.text_and_images.text.text }}{% if not loop.last %}
+
+{% endif %}{% endfor %}
+"""
 
 [pipe.extract_page_contents]
 type            = "PipeExtract"
