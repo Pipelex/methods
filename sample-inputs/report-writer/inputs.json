@@ -1,0 +1,65 @@
+{
+  "findings": {
+    "concept": "native.JSON",
+    "content": {
+      "json_obj": {
+        "report_period": "Q3 2025 (July\u2013September)",
+        "company": "Acme Corp",
+        "prepared_for": "Evotis S.A.S \u2014 M&A Due Diligence",
+        "financial_metrics": {
+          "quarterly_revenue": "EUR 3,200,000",
+          "revenue_growth_yoy": "+28%",
+          "gross_margin": "69.2%",
+          "operating_margin": "14.8%",
+          "cash_position": "EUR 2,650,000",
+          "burn_rate": "Positive (cash-flow positive since Q1 2025)",
+          "arr": "EUR 12,100,000",
+          "net_revenue_retention": "118%"
+        },
+        "customer_metrics": {
+          "total_customers": 195,
+          "new_customers_q3": 12,
+          "churned_customers_q3": 3,
+          "enterprise_customers_pct": "62%",
+          "average_contract_value": "EUR 55,000/year",
+          "top_customer_concentration": "EuroBank AG \u2014 18% of revenue"
+        },
+        "product_metrics": {
+          "documents_processed_monthly": "10.2 million",
+          "platform_uptime": "99.97%",
+          "avg_processing_latency_ms": 340,
+          "new_features_shipped": 8,
+          "nps_score": 62
+        },
+        "team_metrics": {
+          "total_headcount": 45,
+          "engineering_pct": "47%",
+          "open_positions": 4,
+          "voluntary_turnover_annualized": "8%",
+          "notable_departures": "CTO (Luc Bernard) \u2014 departed end of Q3"
+        },
+        "risk_factors": [
+          "CTO departure creates leadership gap in technical strategy",
+          "Customer concentration risk: top client is 18% of revenue",
+          "DataLicense GmbH contract renewal pending \u2014 core OCR dependency",
+          "Only 2 completed cloud migration projects (below typical expectation for services revenue target)"
+        ],
+        "growth_opportunities": [
+          "DACH market expansion via Berlin sales office (2 new AEs hired Q3)",
+          "Healthcare vertical showing strong traction (35% of new logos)",
+          "Self-serve tier launch planned Q4 2025 \u2014 could accelerate SMB acquisition",
+          "AI model improvements reducing processing latency by 40% (competitive advantage)"
+        ]
+      }
+    }
+  },
+  "config": {
+    "concept": "report_writing.ReportConfig",
+    "content": {
+      "format": "detailed",
+      "tone": "professional",
+      "audience": "Evotis S.A.S M&A team and board members evaluating the Acme Corp acquisition",
+      "max_length": "medium"
+    }
+  }
+}

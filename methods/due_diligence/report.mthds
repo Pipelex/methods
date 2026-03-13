@@ -2,10 +2,6 @@ domain      = "due_diligence_report"
 description = "Synthesize due diligence analyses into an actionable report with risk matrix and valuation considerations."
 main_pipe   = "analyze_company"
 
-# ---------------------------------------------------------------------------
-# Concepts
-# ---------------------------------------------------------------------------
-
 [concept.DueDiligenceReport]
 description = "Comprehensive due diligence report synthesizing financial, contractual, and talent analyses into actionable M&A recommendations."
 
@@ -26,9 +22,16 @@ opportunities = { type = "text", description = "Synergies, growth opportunities,
 recommendation = { type = "text", description = "Clear proceed/do-not-proceed/proceed-with-conditions recommendation with rationale", required = true }
 next_steps = { type = "text", description = "Recommended next steps: additional due diligence areas, negotiations, conditions precedent", required = true }
 
-# ---------------------------------------------------------------------------
-# Pipes — Synthesis
-# ---------------------------------------------------------------------------
+[pipe.analyze_company]
+type = "PipeSequence"
+description = "End-to-end due diligence analysis pipeline: extract all documents in parallel, analyze financial, contractual, and talent dimensions in parallel, then synthesize into a comprehensive due diligence report."
+inputs = { financial_statements = "Document", contracts = "Document", org_chart = "Document" }
+output = "DueDiligenceReport"
+steps = [
+  { pipe = "extract_all_documents", result = "all_pages" },
+  { pipe = "analyze_all", result = "all_analyses" },
+  { pipe = "synthesize_report", result = "report" },
+]
 
 [pipe.synthesize_report]
 type = "PipeLLM"
@@ -75,18 +78,3 @@ Retention Risk: $talent_assessment.retention_risk
 Retention Factors: $talent_assessment.retention_factors
 Culture: $talent_assessment.culture_observations
 """
-
-# ---------------------------------------------------------------------------
-# Pipes — Main Pipeline
-# ---------------------------------------------------------------------------
-
-[pipe.analyze_company]
-type = "PipeSequence"
-description = "End-to-end due diligence analysis pipeline: extract all documents in parallel, analyze financial, contractual, and talent dimensions in parallel, then synthesize into a comprehensive due diligence report."
-inputs = { financial_statements = "Document", contracts = "Document", org_chart = "Document" }
-output = "DueDiligenceReport"
-steps = [
-  { pipe = "extract_all_documents", result = "all_pages" },
-  { pipe = "analyze_all", result = "all_analyses" },
-  { pipe = "synthesize_report", result = "report" },
-]

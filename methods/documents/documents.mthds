@@ -1,6 +1,33 @@
 domain      = "documents"
 description = "The domain of documents made of pages that contain text and images"
 
+[pipe.extract_document_text]
+type = "PipeSequence"
+description = "Extract a document and concatenate all pages into a single Text"
+inputs = { document = "Document" }
+output = "Text"
+steps = [
+  { pipe = "extract_text_pages", result = "pages" },
+  { pipe = "join_texts_from_pages", result = "text" },
+]
+
+[pipe.extract_document_markdown]
+type = "PipeSequence"
+description = "Extract a document and concatenate all pages into a single markdown Text"
+inputs = { document = "Document" }
+output = "Text"
+steps = [
+  { pipe = "extract_markdown_pages", result = "pages" },
+  { pipe = "join_texts_from_pages", result = "text" },
+]
+
+[pipe.extract_text_pages]
+type        = "PipeExtract"
+description = "Extract text content from a document as a list of pages"
+inputs      = { document = "Document" }
+output      = "Page[]"
+model       = "@default-extract-document"
+
 [pipe.extract_markdown_pages]
 type            = "PipeExtract"
 description     = "Extract page text markdown from a document"
@@ -9,6 +36,13 @@ output          = "Page[]"
 model           = "azure-document-intelligence"
 max_page_images = 0
 page_views      = false
+
+[pipe.join_texts_from_pages]
+type        = "PipeCompose"
+description = "Concatenate all pages' text into a single Text"
+inputs      = { pages = "Page[]" }
+output      = "Text"
+template    = "$pages"
 
 [pipe.extract_page_contents]
 type            = "PipeExtract"

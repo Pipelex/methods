@@ -81,6 +81,18 @@ culture_observations = { type = "text", description = "Observations about compan
 # Pipes — Extraction
 # ---------------------------------------------------------------------------
 
+[pipe.extract_all_documents]
+type = "PipeParallel"
+description = "Extract all three due diligence documents in parallel: financial statements, contracts, and org chart."
+inputs = { financial_statements = "Document", contracts = "Document", org_chart = "Document" }
+output = "Page[]"
+add_each_output = true
+branches = [
+  { pipe = "extract_financials", result = "financials_pages" },
+  { pipe = "extract_contracts", result = "contracts_pages" },
+  { pipe = "extract_org_chart", result = "org_chart_pages" },
+]
+
 [pipe.extract_financials]
 type        = "PipeExtract"
 description = "Extract text content from the financial statements document."
@@ -102,21 +114,21 @@ inputs      = { org_chart = "Document" }
 output      = "Page[]"
 model       = "@default-extract-document"
 
-[pipe.extract_all_documents]
-type = "PipeParallel"
-description = "Extract all three due diligence documents in parallel: financial statements, contracts, and org chart."
-inputs = { financial_statements = "Document", contracts = "Document", org_chart = "Document" }
-output = "Page[]"
-add_each_output = true
-branches = [
-  { pipe = "extract_financials", result = "financials_pages" },
-  { pipe = "extract_contracts", result = "contracts_pages" },
-  { pipe = "extract_org_chart", result = "org_chart_pages" },
-]
-
 # ---------------------------------------------------------------------------
 # Pipes — Analysis
 # ---------------------------------------------------------------------------
+
+[pipe.analyze_all]
+type = "PipeParallel"
+description = "Run all three due diligence analyses in parallel: financial, contractual, and talent assessment."
+inputs = { financials_pages = "Page[]", contracts_pages = "Page[]", org_chart_pages = "Page[]" }
+output = "Anything"
+add_each_output = true
+branches = [
+  { pipe = "analyze_financials", result = "financial_snapshot" },
+  { pipe = "analyze_contracts", result = "contractual_risks" },
+  { pipe = "analyze_org", result = "talent_assessment" },
+]
 
 [pipe.analyze_financials]
 type = "PipeLLM"
@@ -188,15 +200,3 @@ Analyze the following organizational chart and structure documents. Assess the t
 
 @org_chart_pages
 """
-
-[pipe.analyze_all]
-type = "PipeParallel"
-description = "Run all three due diligence analyses in parallel: financial, contractual, and talent assessment."
-inputs = { financials_pages = "Page[]", contracts_pages = "Page[]", org_chart_pages = "Page[]" }
-output = "Anything"
-add_each_output = true
-branches = [
-  { pipe = "analyze_financials", result = "financial_snapshot" },
-  { pipe = "analyze_contracts", result = "contractual_risks" },
-  { pipe = "analyze_org", result = "talent_assessment" },
-]

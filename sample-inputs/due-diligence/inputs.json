@@ -1,0 +1,23 @@
+{
+  "financial_statements": {
+    "concept": "native.Document",
+    "content": {
+      "url": "inputs/acme_financial_statements.pdf",
+      "mime_type": "application/pdf"
+    }
+  },
+  "contracts": {
+    "concept": "native.Document",
+    "content": {
+      "url": "inputs/acme_contracts_portfolio.pdf",
+      "mime_type": "application/pdf"
+    }
+  },
+  "org_chart": {
+    "concept": "native.Document",
+    "content": {
+      "url": "inputs/acme_org_chart.pdf",
+      "mime_type": "application/pdf"
+    }
+  }
+}

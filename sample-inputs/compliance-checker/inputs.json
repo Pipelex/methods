@@ -1,0 +1,38 @@
+{
+  "document": {
+    "concept": "native.Document",
+    "content": {
+      "url": "inputs/synthetic_contract.pdf",
+      "mime_type": "application/pdf"
+    }
+  },
+  "rules": {
+    "concept": "compliance_checking.Rule[]",
+    "content": [
+      {
+        "rule_id": "GDPR-001",
+        "rule_text": "The agreement must include explicit provisions for GDPR compliance, including data processing terms, data subject rights, and breach notification procedures within 72 hours.",
+        "severity": "critical",
+        "category": "Data Protection"
+      },
+      {
+        "rule_id": "PAY-001",
+        "rule_text": "Payment terms must not exceed Net 30 days from invoice date. Any payment terms beyond 30 days require CFO approval and must include late payment interest provisions.",
+        "severity": "major",
+        "category": "Financial Terms"
+      },
+      {
+        "rule_id": "TERM-001",
+        "rule_text": "The agreement must include a termination for convenience clause allowing either party to exit with no more than 60 days written notice, without excessive termination fees.",
+        "severity": "major",
+        "category": "Termination"
+      },
+      {
+        "rule_id": "LIAB-001",
+        "rule_text": "Liability caps should not exceed two times (2x) the annual contract value. Any limitation of liability clause must carve out exceptions for gross negligence, willful misconduct, and data breaches.",
+        "severity": "minor",
+        "category": "Liability"
+      }
+    ]
+  }
+}
