@@ -1,9 +1,0 @@
-{
-  "document": {
-    "concept": "native.Document",
-    "content": {
-      "url": "inputs/synthetic_contract.pdf",
-      "mime_type": "application/pdf"
-    }
-  }
-}
