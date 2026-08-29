@@ -2,7 +2,7 @@
 name = "text_stats"
 display_name = "Text Stats"
 address = "github.com/Pipelex/methods"
-version = "0.1.0"
+version = "0.1.1"
 description = "Deterministic text statistics computed in pure Python: character, word, sentence and paragraph counts, vocabulary richness, most frequent words, and estimated reading and speaking times, reported as Markdown."
 authors = ["Evotis S.A.S"]
 license = "MIT"

@@ -64,7 +64,17 @@ Today this resolves against packages installed in your project's `.mthds/methods
 
 ## Versioning and tags
 
-Repository-level snapshot tags, `vX.Y.Z`: a tag pins the whole library at a commit, and `<address>@<tag>` runs any package exactly as it was at that snapshot. Individual packages also carry their own `version` in `METHODS.toml`, which moves when that package changes. Per-package tag prefixes (tagging one package's release independently) are a planned refinement of the MTHDS packaging spec; until then, tags are snapshots of the whole repository.
+Repository-level snapshot tags, `vX.Y.Z`: a tag pins the whole library at a commit, and `<address>@<tag>` runs any package exactly as it was at that snapshot. Every package also carries a `version` in its `METHODS.toml`, and the standing convention is **lockstep**: that version is the repository's version, so a package manifest always states the release line it belongs to rather than a count of its own edits. A manifest declaring a version its tag does not carry is a bug — nothing reads the field today, but the moment it becomes authoritative (cache keys, registry indexing, conflict resolution) a manifest disagreeing with its tag resolves silently to the wrong artifact.
+
+Per-package tag prefixes — tagging and versioning one package's release independently of the rest of the library — are the anticipated direction and a planned refinement of the MTHDS packaging spec. That decision is still open; lockstep is the interim convention and holds until it is settled.
+
+### Cutting a release
+
+Before pushing a tag `vX.Y.Z`:
+
+1. Set `version = "X.Y.Z"` in **every** `methods/*/METHODS.toml` — all of them, including the packages that did not change in this release. Lockstep means no manifest is left behind.
+2. Commit that version sync, and tag **that commit**, so the tag and the manifests it contains agree.
+3. Verify before tagging: `grep -h '^version = ' methods/*/METHODS.toml | sort -u` must print exactly one line, and it must be the version you are about to tag.
 
 ## Contributing a method
 

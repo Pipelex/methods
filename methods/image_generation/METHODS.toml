@@ -2,7 +2,7 @@
 name = "image_generation"
 display_name = "Image Generation"
 address = "github.com/Pipelex/methods"
-version = "0.1.0"
+version = "0.1.1"
 description = "Image generation methods: render a description directly, or refine it into an optimized image prompt first."
 authors = ["Evotis S.A.S"]
 license = "MIT"

@@ -2,7 +2,7 @@
 name = "cv_analyzer"
 display_name = "CV Analyzer"
 address = "github.com/Pipelex/methods"
-version = "0.1.0"
+version = "0.1.1"
 description = "End-to-end candidate screening: extract a CV and a job offer, analyze the match, then either generate tailored interview questions or draft a courteous refusal email."
 authors = ["Evotis S.A.S"]
 license = "MIT"

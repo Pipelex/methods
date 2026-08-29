@@ -2,7 +2,7 @@
 name = "table_extraction"
 display_name = "Table Extraction"
 address = "github.com/Pipelex/methods"
-version = "0.1.0"
+version = "0.1.1"
 description = "Extract a data table from a screenshot into faithful HTML, then review the result against the image to correct text and formatting."
 authors = ["Evotis S.A.S"]
 license = "MIT"

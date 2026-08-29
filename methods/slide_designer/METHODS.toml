@@ -2,7 +2,7 @@
 name = "slide_designer"
 display_name = "Slide Designer"
 address = "github.com/Pipelex/methods"
-version = "0.1.0"
+version = "0.1.1"
 description = "Turn a rough slide-deck brief into design proposals: polish the brief, generate multiple visual themes, render a mockup image for each, and compose an HTML report presenting them all."
 authors = ["Evotis S.A.S"]
 license = "MIT"

@@ -2,7 +2,7 @@
 name = "doc_summarizer"
 display_name = "Document Summarizer"
 address = "github.com/Pipelex/methods"
-version = "0.2.0"
+version = "0.1.1"
 description = "Deep document summarization: profile the document and extract importance-ranked key points in parallel, then synthesize a structured summary with themes and open questions."
 authors = ["Evotis S.A.S"]
 license = "MIT"

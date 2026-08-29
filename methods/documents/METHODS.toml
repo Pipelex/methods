@@ -2,7 +2,7 @@
 name = "documents"
 display_name = "Documents"
 address = "github.com/Pipelex/methods"
-version = "0.2.0"
+version = "0.1.1"
 description = "Document extraction methods for text, images, and page views."
 authors = ["Evotis S.A.S"]
 license = "MIT"
