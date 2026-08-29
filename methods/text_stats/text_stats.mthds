@@ -1,0 +1,10 @@
+domain      = "text_stats"
+description = "Deterministic text statistics: counts, vocabulary richness, most frequent words, and estimated reading and speaking times — computed by a sandboxed Python function, no LLM involved."
+main_pipe   = "analyze_text"
+
+[pipe.analyze_text]
+type          = "PipeFunc"
+description   = "Compute deterministic statistics about the input text (counts, averages, top words, reading time) and format them as a Markdown report."
+inputs        = { text = "Text" }
+output        = "Text"
+function_name = "text_stats_report"

@@ -14,6 +14,7 @@ This repository is the public library of packaged [MTHDS](https://mthds.ai) meth
 | [`slide_designer`](methods/slide_designer/) | Turn a rough slide-deck brief into design proposals: multiple visual themes, a rendered mockup image for each, and an HTML report presenting them all | `generate_design_proposals_from_rough_brief` |
 | [`image_generation`](methods/image_generation/) | Generate images from text: render a description directly, or refine it into an optimized image prompt first | `illustrate` |
 | [`tweet_optimizer`](methods/tweet_optimizer/) | Score a draft tech tweet for fluffiness, cringiness, humblebragging and vagueness, then rewrite it in your own writing style | `optimize_tweet_sequence` |
+| [`text_stats`](methods/text_stats/) | Deterministic text statistics computed by a sandboxed Python function (PipeFunc, no LLM): counts, vocabulary richness, most frequent words, and estimated reading and speaking times, as a Markdown report | `analyze_text` |
 
 Each package directory carries its manifest, its bundles, and where practical a sample `inputs.json` you can run as-is.
 
