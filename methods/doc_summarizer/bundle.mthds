@@ -89,10 +89,17 @@ description = "Deep document summarization: extract content, then profile struct
 inputs = { document = "Document" }
 output = "Summary"
 steps = [
-  { pipe = "github.com/Pipelex/methods/documents->documents.extract_text_pages", result = "pages" },
+  { pipe = "extract_text_pages", result = "pages" },
   { pipe = "analyze_in_parallel", result = "analysis" },
   { pipe = "synthesize_summary", result = "summary" },
 ]
+
+[pipe.extract_text_pages]
+type        = "PipeExtract"
+description = "Extract text content from the document as a list of pages."
+inputs      = { document = "Document" }
+output      = "Page[]"
+model       = "@default-extract-document"
 
 # ---------------------------------------------------------------------------
 # Pipes — Parallel Analysis
@@ -102,7 +109,7 @@ steps = [
 type = "PipeParallel"
 description = "Run document profiling and key point extraction in parallel."
 inputs = { pages = "Page[]" }
-output = "Anything"
+output = "Composite"
 add_each_output = true
 branches = [
   { pipe = "profile_document", result = "profile" },
