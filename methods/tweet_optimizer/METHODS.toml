@@ -1,0 +1,13 @@
+[package]
+name = "tweet_optimizer"
+display_name = "Tweet Optimizer"
+address = "github.com/Pipelex/methods"
+version = "0.1.0"
+description = "Optimize a tech tweet: score the draft for fluffiness, cringiness, humblebragging and vagueness, then rewrite it in your own writing style following Twitter/X best practices."
+authors = ["Evotis S.A.S"]
+license = "MIT"
+mthds_version = ">=1.0.0"
+main_pipe = "optimize_tweet_sequence"
+
+[exports.tech_tweet]
+pipes = ["optimize_tweet_sequence", "analyze_tweet"]

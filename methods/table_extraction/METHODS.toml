@@ -1,0 +1,13 @@
+[package]
+name = "table_extraction"
+display_name = "Table Extraction"
+address = "github.com/Pipelex/methods"
+version = "0.1.0"
+description = "Extract a data table from a screenshot into faithful HTML, then review the result against the image to correct text and formatting."
+authors = ["Evotis S.A.S"]
+license = "MIT"
+mthds_version = ">=1.0.0"
+main_pipe = "extract_html_table_and_review"
+
+[exports.tables]
+pipes = ["extract_html_table_and_review", "extract_html_table_from_image"]

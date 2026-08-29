@@ -1,0 +1,13 @@
+[package]
+name = "invoice_extraction"
+display_name = "Invoice Extraction"
+address = "github.com/Pipelex/methods"
+version = "0.1.0"
+description = "Extract structured invoice data from a document: classify each page as bill or receipt, then extract amounts, VAT, vendor and buyer details using both the OCR text and the page view."
+authors = ["Evotis S.A.S"]
+license = "MIT"
+mthds_version = ">=1.0.0"
+main_pipe = "process_invoice"
+
+[exports.invoice_extraction]
+pipes = ["process_invoice", "extract_invoice"]

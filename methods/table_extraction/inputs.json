@@ -1,0 +1,8 @@
+{
+  "table_screenshot": {
+    "concept": "tables.TableScreenshot",
+    "content": {
+      "url": "https://raw.githubusercontent.com/Pipelex/pipelex-cookbook/main/examples/b_basics/document_extract/extract_table/inputs/table_image.png"
+    }
+  }
+}
