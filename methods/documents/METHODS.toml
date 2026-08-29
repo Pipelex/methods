@@ -2,9 +2,12 @@
 name = "documents"
 display_name = "Documents"
 address = "github.com/Pipelex/methods"
-version = "0.1.4"
+version = "0.2.0"
 description = "Document extraction methods for text, images, and page views."
+authors = ["Evotis S.A.S"]
+license = "MIT"
 mthds_version = ">=1.0.0"
+main_pipe = "extract_document_markdown"
 
 [exports.documents]
 pipes = [
