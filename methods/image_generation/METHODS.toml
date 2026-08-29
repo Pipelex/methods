@@ -1,0 +1,13 @@
+[package]
+name = "image_generation"
+display_name = "Image Generation"
+address = "github.com/Pipelex/methods"
+version = "0.1.0"
+description = "Image generation methods: render a description directly, or refine it into an optimized image prompt first."
+authors = ["Evotis S.A.S"]
+license = "MIT"
+mthds_version = ">=1.0.0"
+main_pipe = "illustrate"
+
+[exports.image_generation]
+pipes = ["illustrate", "generate_image"]

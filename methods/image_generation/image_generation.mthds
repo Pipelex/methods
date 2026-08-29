@@ -1,0 +1,58 @@
+domain      = "image_generation"
+description = "Generating images from text descriptions, directly or through prompt optimization"
+
+[concept.ImagePrompt]
+description = """
+A detailed textual description optimized for image generation models, including subjects, setting, style, and visual details.
+"""
+refines = "Text"
+
+[pipe.illustrate]
+type = "PipeSequence"
+description = """
+Turn a free-form description into an optimized image generation prompt, then render it as an image.
+"""
+inputs = { description = "Text" }
+output = "Image"
+steps = [
+  { pipe = "optimize_image_prompt", result = "image_prompt" },
+  { pipe = "render_image", result = "illustration" },
+]
+
+[pipe.generate_image]
+type        = "PipeImgGen"
+description = "Generate an image directly from a text description"
+inputs      = { description = "Text" }
+output      = "Image"
+prompt      = "$description"
+model       = "nano-banana-2"
+
+[pipe.optimize_image_prompt]
+type = "PipeLLM"
+description = """
+Transform a free-form description into a detailed, optimized prompt for image generation.
+"""
+inputs = { description = "Text" }
+output = "ImagePrompt"
+model = "@default-small"
+system_prompt = """
+You are an expert at crafting prompts for image generation AI models.
+"""
+prompt = """
+Transform this description into an optimized image generation prompt:
+
+$description
+
+Your task is to take the description and transform it into an efficient image generation prompt.
+Don't change the ideas, don't add new ideas.
+Be concise but descriptive.
+Don't include a title, intro or outro, just the prompt.
+"""
+
+[pipe.render_image]
+type        = "PipeImgGen"
+description = "Render an image from an optimized image prompt"
+inputs      = { image_prompt = "ImagePrompt" }
+output      = "Image"
+prompt      = "$image_prompt"
+model       = "nano-banana-2"
