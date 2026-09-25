@@ -2,7 +2,7 @@
   "document": {
     "concept": "native.Document",
     "content": {
-      "url": "https://raw.githubusercontent.com/Pipelex/pipelex-cookbook/main/assets/extract_proof_of_purchase/restaurant_invoice.pdf",
+      "url": "https://raw.githubusercontent.com/Pipelex/pipelex-cookbook/v0.18.0/assets/extract_proof_of_purchase/restaurant_invoice.pdf",
       "mime_type": "application/pdf"
     }
   }
