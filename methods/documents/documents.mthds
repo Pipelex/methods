@@ -33,7 +33,7 @@ type            = "PipeExtract"
 description     = "Extract page text markdown from a document"
 inputs          = { document = "Document" }
 output          = "Page[]"
-model           = "azure-document-intelligence"
+model           = "@default-extract-document"
 max_page_images = 0
 page_views      = false
 

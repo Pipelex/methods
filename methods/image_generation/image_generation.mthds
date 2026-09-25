@@ -25,7 +25,7 @@ description = "Generate an image directly from a text description"
 inputs      = { description = "Text" }
 output      = "Image"
 prompt      = "$description"
-model       = "nano-banana-2"
+model       = "@default-general"
 
 [pipe.optimize_image_prompt]
 type = "PipeLLM"
@@ -55,4 +55,4 @@ description = "Render an image from an optimized image prompt"
 inputs      = { image_prompt = "ImagePrompt" }
 output      = "Image"
 prompt      = "$image_prompt"
-model       = "nano-banana-2"
+model       = "@default-general"
