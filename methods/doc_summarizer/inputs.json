@@ -2,7 +2,8 @@
   "document": {
     "concept": "native.Document",
     "content": {
-      "url": "https://mock-d6ae6957.invalid/ee7a682e-4944-4e1e-81b4-178fdd2a6788"
+      "url": "https://raw.githubusercontent.com/Pipelex/pipelex-cookbook/v0.18.0/assets/presentations/CatOps.pdf",
+      "mime_type": "application/pdf"
     }
   }
 }

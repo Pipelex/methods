@@ -89,6 +89,7 @@ Beyond that rule:
 - **Exports**: list the pipes you mean callers to use in `[exports.<domain>]`; unlisted pipes stay private to the package.
 - **It must validate**: `pipelex validate bundle methods/<your_method>/` must pass before you open a PR.
 - **Quality over quantity**: a method that actually runs, with a sample `inputs.json` where practical, beats a pile of stubs. Keep binary assets out of the package — link to hosted samples instead.
+- **Samples must answer**: every URL in a sample `inputs.json` must resolve, and no release is cut while one does not. A file hosted on GitHub is linked at a tag, never at a branch, so the sample cannot change under a library tag; the library's own samples use the [Pipelex cookbook](https://github.com/Pipelex/pipelex-cookbook)'s tags.
 
 ## License
 
