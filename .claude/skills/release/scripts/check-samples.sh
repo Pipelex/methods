@@ -10,12 +10,14 @@
 # documentation and testing (.invalid, .test, .example, .localhost, and
 # example.com, example.net, example.org), which is what a generated inputs
 # template's placeholder looks like, and a raw.githubusercontent.com URL whose
-# ref is not a v* tag, since a sample must not change under a library tag.
-# Every other URL must answer a request for its first byte with a 2xx. No call
-# spends inference. Prints one line per URL, and one per file jq cannot read,
-# and exits non-zero when any line is a failure.
+# ref is not a v* tag, since a sample must not change under a library tag. A
+# bare ref (<owner>/<repo>/<ref>/<file>) is looked up with git ls-remote, since
+# a branch can be named like a version: it must be a tag of that repository
+# and not also a branch. Every other URL must answer a request for its first
+# byte with a 2xx. No call spends inference. Prints one line per URL, and one
+# per file jq cannot read, and exits non-zero when any line is a failure.
 #
-# Needs curl and jq.
+# Needs curl, git and jq.
 
 set -euo pipefail
 
@@ -26,7 +28,7 @@ for arg in "$@"; do
   fi
   [ -f "$arg" ] || { echo "$arg: no such file" >&2; exit 2; }
 done
-for tool in curl jq; do
+for tool in curl git jq; do
   command -v "$tool" >/dev/null || { echo "$tool is required" >&2; exit 2; }
 done
 
@@ -43,7 +45,7 @@ failures=0
 
 # Why a URL is refused before anything fetches it, or nothing when it is not.
 refusal() {
-  local url=$1 rest host owner repo ref kind name
+  local url=$1 rest host owner repo ref kind name spelled_as_tag refs
   if [[ ! "$url" =~ ^[Hh][Tt][Tt][Pp][Ss]?:// ]]; then
     echo "not an http(s) URL, so the hosted API cannot fetch it"
     return
@@ -71,16 +73,34 @@ refusal() {
   if [ "$host" = raw.githubusercontent.com ]; then
     # The path is /<owner>/<repo>/<ref>/<file>, the ref possibly spelled refs/tags/<tag>.
     IFS=/ read -r owner repo ref kind name _ <<<"${rest#*/}"
+    spelled_as_tag=false
     if [ "$ref" = refs ]; then
       if [ "$kind" != tags ]; then
         echo "names refs/$kind/$name, which is not a tag, so the file can change under a library tag: link it at a v* tag of $owner/$repo"
         return
       fi
       ref=$name
+      spelled_as_tag=true
     fi
     if [[ ! "$ref" =~ ^v[0-9] ]]; then
       echo "names the ref '$ref', which is not a v* tag, so the file can change under a library tag: link it at a v* tag of $owner/$repo"
       return
+    fi
+    # A bare ref is whatever GitHub resolves the name to, and a branch can be
+    # named like a version, so ask GitHub which one it is.
+    if [ "$spelled_as_tag" = false ]; then
+      if ! refs=$(GIT_TERMINAL_PROMPT=0 git ls-remote "https://github.com/$owner/$repo.git" "refs/tags/$ref" "refs/heads/$ref" 2>"$errors"); then
+        echo "cannot list the refs of $owner/$repo on GitHub: $(head -n 1 "$errors")"
+        return
+      fi
+      if [ -z "$(awk -v want="refs/tags/$ref" '$2 == want' <<<"$refs")" ]; then
+        echo "names '$ref', which is not a tag of $owner/$repo, so the file can change under a library tag: link it at a v* tag"
+        return
+      fi
+      if [ -n "$(awk -v want="refs/heads/$ref" '$2 == want' <<<"$refs")" ]; then
+        echo "names '$ref', which is both a tag and a branch of $owner/$repo: spell it refs/tags/$ref so the tag is what is served"
+        return
+      fi
     fi
   fi
 }
