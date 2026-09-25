@@ -1,0 +1,55 @@
+name: Changelog check
+
+# On a `release/vX.Y.Z` → `main` PR, assert CHANGELOG.md has the matching entry
+# and no `[Unreleased]` heading survives. The post-merge tagger refuses to tag a
+# version with no changelog entry, so catching it here keeps `main` from landing
+# a bump that cannot be released.
+
+on:
+  pull_request:
+    branches:
+      - main
+    types: [opened, synchronize, reopened]
+
+jobs:
+  changelog-check:
+    name: Changelog entry for release version
+    runs-on: ubuntu-latest
+    steps:
+      - name: Identify the source branch
+        id: branch_info
+        env:
+          SOURCE_BRANCH: ${{ github.event.pull_request.head.ref }}
+        run: |
+          echo "Source branch: $SOURCE_BRANCH"
+
+          if [[ "$SOURCE_BRANCH" =~ ^release/v([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
+            echo "is_release=true" >> "$GITHUB_OUTPUT"
+            echo "release_version=${BASH_REMATCH[1]}" >> "$GITHUB_OUTPUT"
+          else
+            echo "is_release=false" >> "$GITHUB_OUTPUT"
+            echo "Not a release branch — nothing to check."
+          fi
+
+      - name: Checkout repo
+        if: steps.branch_info.outputs.is_release == 'true'
+        uses: actions/checkout@v4
+
+      - name: Check changelog entry
+        if: steps.branch_info.outputs.is_release == 'true'
+        run: |
+          VERSION="${{ steps.branch_info.outputs.release_version }}"
+
+          if ! grep -q "^## \[v$VERSION\] - " CHANGELOG.md; then
+            echo "::error::No changelog entry found for v$VERSION"
+            echo "Versions currently in the changelog:"
+            grep -E "^## \[v[0-9]+\.[0-9]+\.[0-9]+\]" CHANGELOG.md || true
+            exit 1
+          fi
+          echo "✅ Changelog entry found for v$VERSION"
+
+          if grep -q "^## \[Unreleased\]" CHANGELOG.md; then
+            echo "::error::CHANGELOG.md still has an [Unreleased] heading — fold it into the v$VERSION entry."
+            exit 1
+          fi
+          echo "✅ No [Unreleased] heading left"

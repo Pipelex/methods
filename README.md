@@ -70,11 +70,7 @@ Per-package tag prefixes — tagging and versioning one package's release indepe
 
 ### Cutting a release
 
-Before pushing a tag `vX.Y.Z`:
-
-1. Set `version = "X.Y.Z"` in **every** `methods/*/METHODS.toml` — all of them, including the packages that did not change in this release. Lockstep means no manifest is left behind.
-2. Commit that version sync, and tag **that commit**, so the tag and the manifests it contains agree.
-3. Verify before tagging: `grep -h '^version = ' methods/*/METHODS.toml | sort -u` must print exactly one line, and it must be the version you are about to tag.
+A release is a `release/vX.Y.Z` branch cut from `dev` that sets the version in **every** `methods/*/METHODS.toml` and turns the `[Unreleased]` section of [`CHANGELOG.md`](CHANGELOG.md) into the release's entry, merged into `main` by pull request. Nobody pushes a tag by hand: the merge creates the annotated tag and the GitHub Release, and refuses to when the manifests disagree or the changelog has no entry. The steps, the checks and the workflows behind them are in [`docs/releasing.md`](docs/releasing.md).
 
 ## Contributing a method
 

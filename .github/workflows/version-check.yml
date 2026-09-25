@@ -1,0 +1,51 @@
+name: Version check
+
+# On a `release/vX.Y.Z` → `main` PR, assert that every `methods/*/METHODS.toml`
+# declares the version in the branch name. The library versions in lockstep —
+# a package's version is the library's version — so one manifest left behind
+# fails the check. Other PRs into `main` pass trivially.
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  version-check:
+    name: Every manifest matches release branch
+    runs-on: ubuntu-latest
+    steps:
+      - name: Identify the source branch
+        id: branch_info
+        env:
+          SOURCE_BRANCH: ${{ github.event.pull_request.head.ref }}
+        run: |
+          echo "Source branch: $SOURCE_BRANCH"
+
+          if [[ "$SOURCE_BRANCH" =~ ^release/v([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
+            echo "is_release=true" >> "$GITHUB_OUTPUT"
+            echo "release_version=${BASH_REMATCH[1]}" >> "$GITHUB_OUTPUT"
+          else
+            echo "is_release=false" >> "$GITHUB_OUTPUT"
+            echo "Not a release branch — nothing to check."
+          fi
+
+      - name: Checkout repo
+        if: steps.branch_info.outputs.is_release == 'true'
+        uses: actions/checkout@v4
+
+      - name: Check every manifest matches release branch
+        if: steps.branch_info.outputs.is_release == 'true'
+        run: |
+          RELEASE_VERSION="${{ steps.branch_info.outputs.release_version }}"
+          echo "Release branch version: $RELEASE_VERSION"
+
+          BEHIND=$(grep -L "^version = \"$RELEASE_VERSION\"$" methods/*/METHODS.toml || true)
+          if [ -n "$BEHIND" ]; then
+            echo "::error::These manifests do not declare version $RELEASE_VERSION:"
+            for MANIFEST in $BEHIND; do
+              echo "  $MANIFEST: $(grep '^version = ' "$MANIFEST" || echo 'no version line')"
+            done
+            exit 1
+          fi
+          echo "✅ Every manifest declares $RELEASE_VERSION"

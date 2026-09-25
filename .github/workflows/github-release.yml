@@ -1,0 +1,158 @@
+name: Create release
+
+# Tags and releases the method library when a version bump lands on `main`.
+#
+# The library publishes no package: the repository is the distribution channel,
+# and an address pinned to a tag (`github.com/Pipelex/methods/<name>@vX.Y.Z`)
+# resolves against the annotated `vX.Y.Z` tag. That tag IS the release artifact,
+# which is why this workflow creates it with `git tag -a` and then passes
+# `--verify-tag` to `gh release create`: letting `gh` create the tag implicitly
+# would produce a *lightweight* tag.
+#
+# The version is the one every `methods/*/METHODS.toml` declares, in lockstep,
+# so a manifest left behind fails this workflow before anything is tagged.
+#
+# Pushes to `main` that carry no version bump are normal here — `main` is the
+# default branch, which an address without a tag runs, and it is moved forward
+# between releases — so every step is guarded on "does this tag / release
+# already exist" rather than assuming the push is a release.
+#
+# The tag goes on the release pull request's merge commit, looked up from the
+# merged pull request, never on the commit this run happens to be on. A release
+# run can be cancelled while pending (a concurrency group keeps one pending run
+# and cancels it when another push queues), can fail before tagging, or can be
+# re-dispatched after `main` has moved; in each case the run that does the
+# tagging is on a later commit, which may carry work the release does not.
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  github-release:
+    name: Tag and release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # mandatory for pushing tags and making GitHub Releases
+      pull-requests: read # to find the release pull request's merge commit
+
+    steps:
+      - name: Refuse a ref other than main
+        if: github.ref != 'refs/heads/main'
+        run: |
+          echo "::error::This workflow releases what main carries. Dispatch it from main: a run on $GITHUB_REF could tag a release branch before its merge, and the merge would then find the tag taken."
+          exit 1
+
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # need the tag list to know what has already shipped
+
+      - name: Read the version every manifest declares
+        run: |
+          VERSIONS=$(grep -h '^version = ' methods/*/METHODS.toml | sort -u)
+          if [ "$(printf '%s\n' "$VERSIONS" | grep -c .)" -ne 1 ]; then
+            echo "::error::The manifests disagree on the version, so there is no single version to release:"
+            grep -H '^version = ' methods/*/METHODS.toml
+            exit 1
+          fi
+          VERSION=$(printf '%s' "$VERSIONS" | cut -d '"' -f 2)
+          if [ -z "$VERSION" ]; then
+            echo "::error::Could not read a version from methods/*/METHODS.toml"
+            exit 1
+          fi
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "Version on main: $VERSION"
+
+      - name: Check what already exists
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          if git rev-parse -q --verify "refs/tags/v$VERSION" >/dev/null; then
+            echo "TAG_EXISTS=1" >> "$GITHUB_ENV"
+            echo "Tag v$VERSION already exists."
+          fi
+          if gh release view "v$VERSION" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "RELEASE_EXISTS=1" >> "$GITHUB_ENV"
+            echo "Release v$VERSION already exists."
+          fi
+
+      - name: Nothing to do
+        if: env.TAG_EXISTS == '1' && env.RELEASE_EXISTS == '1'
+        run: echo "v$VERSION is already tagged and released — this push carried no version bump."
+
+      - name: Resolve the release commit
+        if: env.TAG_EXISTS != '1' || env.RELEASE_EXISTS != '1'
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          if [ "$TAG_EXISTS" = "1" ]; then
+            TARGET=$(git rev-list -n 1 "v$VERSION")
+            echo "v$VERSION is already on $TARGET; only the Release is missing."
+          else
+            TARGET=$(gh pr list --repo "$GITHUB_REPOSITORY" --state merged --base main --head "release/v$VERSION" \
+              --json mergeCommit --jq '.[0].mergeCommit.oid // empty')
+            if [ -z "$TARGET" ]; then
+              echo "::error::The manifests declare $VERSION, which is not tagged, but no pull request from release/v$VERSION was merged into main — refusing to tag a commit no release pull request produced."
+              exit 1
+            fi
+            if ! git merge-base --is-ancestor "$TARGET" HEAD; then
+              echo "::error::The release pull request's merge commit $TARGET is not in main's history at $(git rev-parse HEAD) — refusing to tag."
+              exit 1
+            fi
+            echo "The release pull request for v$VERSION merged as $TARGET."
+          fi
+          echo "TARGET=$TARGET" >> "$GITHUB_ENV"
+
+      - name: Verify changelog entry exists
+        if: env.TAG_EXISTS != '1' || env.RELEASE_EXISTS != '1'
+        run: |
+          if ! git show "$TARGET:CHANGELOG.md" | grep -q "^## \[v$VERSION\] - "; then
+            echo "::error::No changelog entry for v$VERSION in CHANGELOG.md at $TARGET — refusing to tag."
+            exit 1
+          fi
+
+      - name: Create and push annotated tag
+        if: env.TAG_EXISTS != '1'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "v$VERSION" "$TARGET" -m "Library snapshot v$VERSION"
+          git push origin "v$VERSION"
+          echo "Tagged $(git rev-parse --short "$TARGET") as v$VERSION"
+
+      - name: Extract changelog notes for this version
+        if: env.RELEASE_EXISTS != '1'
+        run: |
+          git show "$TARGET:CHANGELOG.md" > "$RUNNER_TEMP/CHANGELOG.md"
+          CHANGELOG="$RUNNER_TEMP/CHANGELOG.md"
+          START_LINE=$(grep -n "^## \[v$VERSION\] - " "$CHANGELOG" | cut -d: -f1)
+          NEXT_VERSION_LINE=$(tail -n +$((START_LINE + 1)) "$CHANGELOG" | grep -n "^## \[v.*\] - " | head -1 | cut -d: -f1)
+
+          if [ -z "$NEXT_VERSION_LINE" ]; then
+            NOTES=$(tail -n +$((START_LINE + 1)) "$CHANGELOG")
+          else
+            NOTES=$(sed -n "$((START_LINE + 1)),$((START_LINE + NEXT_VERSION_LINE - 1))p" "$CHANGELOG")
+          fi
+
+          {
+            echo "CHANGELOG_NOTES<<CHANGELOG_EOF"
+            echo "$NOTES"
+            echo "CHANGELOG_EOF"
+          } >> "$GITHUB_ENV"
+
+      - name: Create GitHub Release
+        if: env.RELEASE_EXISTS != '1'
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "v$VERSION" \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "v$VERSION" \
+            --verify-tag \
+            --notes "$CHANGELOG_NOTES"
