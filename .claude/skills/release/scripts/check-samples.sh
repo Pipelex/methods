@@ -14,8 +14,10 @@
 # bare ref (<owner>/<repo>/<ref>/<file>) is looked up with git ls-remote, since
 # a branch can be named like a version: it must be a tag of that repository
 # and not also a branch. Every other URL must answer a request for its first
-# byte with a 2xx. No call spends inference. Prints one line per URL, and one
-# per file jq cannot read, and exits non-zero when any line is a failure.
+# byte with a 2xx, and a URL that redirects is held to the same rules where it
+# lands, which is how github.com's /raw/ and ?raw=true links are checked. No
+# call spends inference. Prints one line per URL, and one per file jq cannot
+# read, and exits non-zero when any line is a failure.
 #
 # Needs curl, git and jq.
 
@@ -119,17 +121,29 @@ for file in "$@"; do
       failures=$((failures + 1))
       continue
     fi
-    if code=$(curl -sSL -r 0-0 --max-time 30 --retry 2 -o /dev/null -w '%{http_code}' "$url" 2>"$errors"); then
-      if [[ "$code" == 2?? ]]; then
-        echo "✓ $file: $url"
-      else
-        echo "✗ $file: $url — HTTP $code"
-        failures=$((failures + 1))
-      fi
-    else
+    if ! fetched=$(curl -sSL -r 0-0 --max-time 30 --retry 2 -o /dev/null \
+      -w '%{http_code} %{num_redirects} %{url_effective}' "$url" 2>"$errors"); then
       echo "✗ $file: $url — $(head -n 1 "$errors")"
       failures=$((failures + 1))
+      continue
     fi
+    read -r code redirects effective <<<"$fetched"
+    if [[ "$code" != 2?? ]]; then
+      echo "✗ $file: $url — HTTP $code"
+      failures=$((failures + 1))
+      continue
+    fi
+    # A link can reach raw GitHub through a redirect, as github.com's /raw/ and
+    # ?raw=true links do, so where it lands is held to the same rules.
+    if [ "$redirects" -gt 0 ]; then
+      reason=$(refusal "$effective")
+      if [ -n "$reason" ]; then
+        echo "✗ $file: $url — redirects to $effective, which fails: $reason"
+        failures=$((failures + 1))
+        continue
+      fi
+    fi
+    echo "✓ $file: $url"
   done <<<"$urls"
 done
 
