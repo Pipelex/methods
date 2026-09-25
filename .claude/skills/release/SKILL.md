@@ -20,23 +20,24 @@ The procedure is the workspace release play, [`docs/workspace/releasing.md`](../
 
 ## What ships
 
-Nothing is published to a package registry: the repository is the distribution channel, and what the merge to `main` produces is the annotated `vX.Y.Z` tag that every address pinned to the release resolves against, `github.com/Pipelex/methods/<name>@vX.Y.Z`, with a GitHub Release beside it. Both are created by `.github/workflows/github-release.yml`, which fires on the push to `main`, and on `workflow_dispatch` for a re-run:
+Nothing is published to a package registry: the repository is the distribution channel, and what the merge to `main` produces is the annotated `vX.Y.Z` tag that every address pinned to the release resolves against, `github.com/Pipelex/methods/<name>@vX.Y.Z`, with a GitHub Release beside it. Both are created by `.github/workflows/github-release.yml`, which fires on the push to `main`, and on a `workflow_dispatch` for a re-run, which it refuses from any branch but `main`:
 
 - It reads the version every `methods/*/METHODS.toml` declares, and fails when they do not all declare the same one, so a manifest left behind tags nothing.
 - It is guarded on what already exists, because `main` moves between releases without a version bump: with the tag and the Release both there it reports that the push carried no bump and stops, and with the tag there and no Release it creates only the Release.
-- It refuses to tag when `CHANGELOG.md` has no `## [vX.Y.Z] - ` heading. Otherwise it creates the tag with `git tag -a` on the merge commit, message `Library snapshot vX.Y.Z`, pushes it, and calls `gh release create --verify-tag` with the notes sliced from the changelog: everything between the version's heading and the next `## [v…] - ` heading. Never create the tag by hand first; the workflow tags.
+- It tags the release pull request's merge commit, which it asks GitHub for as the pull request from `release/vX.Y.Z` merged into `main`, never the commit its own run checked out. So a release run cancelled while pending behind another push, a failed run followed by a routine push, and a re-dispatch after `main` moved all tag the same commit. It refuses when no such pull request was merged.
+- It refuses to tag when `CHANGELOG.md` at that commit has no `## [vX.Y.Z] - ` heading. Otherwise it creates the tag with `git tag -a` on the merge commit, message `Library snapshot vX.Y.Z`, pushes it, and calls `gh release create --verify-tag` with the notes sliced from the changelog: everything between the version's heading and the next `## [v…] - ` heading. Never create the tag by hand first; the workflow tags.
 
 The landing verifies the publish from the run, the tag and the Release:
 
 ```bash
-gh run list --workflow=github-release.yml --branch main --limit 3 --json conclusion,headSha,url   # the run whose headSha is the merge SHA: success
-git -C <main> fetch --tags --prune origin && git -C <main> tag --list vX.Y.Z                    # the tag
+gh run list --workflow=github-release.yml --branch main --limit 3 --json conclusion,headSha,url   # the run whose headSha is the merge SHA: success, or a later one if it was cancelled
+git -C <main> fetch --tags --prune origin && git -C <main> rev-list -n 1 vX.Y.Z                 # the tag, on the merge SHA
 gh release view vX.Y.Z                                                                           # the Release and its notes
 ```
 
 Once the tag exists, the landing proves what the release is for: every package runs by its address at the tag. From `<main>`, with `PIPELEX_API_KEY` set, run `.claude/skills/release/scripts/check-addresses.sh vX.Y.Z`. It lists the packages the tag itself carries, asks the hosted API's `POST /v1/validate` to fetch and validate each one at `<address>/<name>@vX.Y.Z`, and spends no inference. Every line must read `✓`. A `✗` is a release that did not do its job, since the hosted fetch refuses that package at its own tag: report it with the line the script printed, and file the fix against `methods` as a bug discovered from the release item.
 
-If the run failed, read its log before anything else. Its deliberate refusals, manifests that disagree and a missing changelog entry, are also what the pull request's checks assert, so either one reaching `main` means a check was bypassed. A failure from outside the repository is re-run with `gh run rerun <run id> --failed`, which the guards make safe.
+If the run failed, read its log before anything else. Its deliberate refusals, manifests that disagree and a missing changelog entry, are also what the pull request's checks assert, so either one reaching `main` means a check was bypassed. A failure from outside the repository is re-run with `gh run rerun <run id> --failed`, or, once `main` has moved on, with `gh workflow run github-release.yml --ref main`. The guards make either safe, since the tag lands on the merge commit whichever run creates it.
 
 ## Version files and the lock
 

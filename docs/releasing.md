@@ -6,7 +6,7 @@ This library publishes no package. The repository is the distribution channel, a
 
 - **The version lives in every `methods/*/METHODS.toml`**, as the `[package]` table's `version`, with no `v` prefix. The library versions in lockstep: a package's version is the library's version, so every manifest moves with every release, including those of packages the release did not touch. There is no `VERSION` file and no second place the number is written.
 - **`CHANGELOG.md`** is the release record, one `## [vX.Y.Z] - YYYY-MM-DD` entry per release, with work in progress gathered under `## [Unreleased]` until it ships. An entry speaks to a caller who pins a tag: which package, pipe or sample changed, and what running it at the new tag changes for them.
-- **Annotated `vX.Y.Z` tags on `main`**, created by a workflow on the merge, never by hand.
+- **Annotated `vX.Y.Z` tags on `main`**, created by a workflow on the release pull request's merge commit, never by hand.
 - **`main` is the default branch**, and an address without a tag runs it at its head. It can therefore move ahead of the last tag between releases, so what a release carries is everything since the last tag, not the difference between `dev` and `main`.
 
 The `v` prefix appears in branch names, changelog headings and tags, never in a manifest.
@@ -33,7 +33,7 @@ The Pipelex team runs these steps with the repository's `/release` skill for Cla
 |---|---|---|
 | `version-check.yml` | pull request → `main` | every `methods/*/METHODS.toml` declares the version in the `release/vX.Y.Z` branch name |
 | `changelog-check.yml` | pull request → `main` | `CHANGELOG.md` has `## [vX.Y.Z] - …` for that version, and no `[Unreleased]` heading survives |
-| `github-release.yml` | push to `main`, and `workflow_dispatch` | creates the annotated tag and the GitHub Release |
+| `github-release.yml` | push to `main`, and `workflow_dispatch` from `main` | creates the annotated tag on the release pull request's merge commit, and the GitHub Release |
 
 The pull-request checks act only on a head matching `release/vX.Y.Z` exactly and pass trivially on anything else. They read the branch name from an environment variable rather than splicing it into their script, since in a public repository anyone can open a pull request from a branch named with shell syntax. Nothing in CI formats, lints or validates a bundle: step 3 above runs on the releaser's machine and nowhere else.
 
@@ -41,16 +41,22 @@ The pull-request checks act only on a head matching `release/vX.Y.Z` exactly and
 
 `gh release create vX.Y.Z` creates a *lightweight* tag when the tag does not exist yet. Because the tag here is the artifact rather than a pointer at a published package, `github-release.yml` creates it with `git tag -a` (message `Library snapshot vX.Y.Z`) on the merge commit and pushes it, then calls `gh release create --verify-tag`, which aborts rather than substituting a lightweight tag if the annotated one is somehow missing.
 
+### Which commit the tag goes on
+
+The tag goes on the release pull request's merge commit, which the workflow finds by asking GitHub for the pull request from `release/vX.Y.Z` merged into `main`, and never on the commit its own run checked out. The two are the same when the run is the merge's own. They differ when the merge's run was cancelled while pending, since a concurrency group keeps a single pending run and cancels it when another push queues; when the merge's run failed before tagging and a later push to `main` ran; and when the workflow was dispatched again after `main` moved on. In each case, tagging the run's own commit would pin a commit carrying work the release does not. The workflow refuses to tag when no such pull request was merged or when its merge commit is not in `main`'s history, and it reads the changelog entry at that commit, so the Release's notes are the ones the tag carries.
+
+A dispatch from any branch other than `main` is refused before anything runs. On a release branch it would otherwise tag the branch's head before the merge, and the merge's own run would then find the tag taken and leave it where it was.
+
 ### Idempotency
 
 Pushes to `main` that carry no version bump are routine, since `main` moves ahead between releases, so every step is guarded on what already exists:
 
 - The version is read from the manifests first, and the workflow fails when they do not all declare the same one, so a manifest left behind tags nothing.
 - Tag and Release both exist: the workflow reports that the push carried no bump and stops.
-- Neither exists: it verifies the changelog entry, tags, then releases.
+- Neither exists: it finds the release pull request's merge commit, verifies the changelog entry there, tags that commit, then releases.
 - The tag exists and the Release does not, after a partial earlier run: it leaves the tag alone and creates only the Release.
 
-The changelog check runs before any tag is written, so a version bump that reached `main` without a changelog entry fails the workflow instead of producing a tag with no release notes. A failure from outside the repository is re-run with `gh run rerun <run id> --failed`, which these guards make safe.
+The changelog check runs before any tag is written, so a version bump that reached `main` without a changelog entry fails the workflow instead of producing a tag with no release notes. A failure from outside the repository is re-run with `gh run rerun <run id> --failed`, or by dispatching the workflow from `main`, and these guards make either safe: the tag lands on the merge commit however far `main` has moved since.
 
 ### Release notes
 

@@ -16,6 +16,13 @@ name: Create release
 # default branch, which an address without a tag runs, and it is moved forward
 # between releases — so every step is guarded on "does this tag / release
 # already exist" rather than assuming the push is a release.
+#
+# The tag goes on the release pull request's merge commit, looked up from the
+# merged pull request, never on the commit this run happens to be on. A release
+# run can be cancelled while pending (a concurrency group keeps one pending run
+# and cancels it when another push queues), can fail before tagging, or can be
+# re-dispatched after `main` has moved; in each case the run that does the
+# tagging is on a later commit, which may carry work the release does not.
 
 on:
   push:
@@ -33,8 +40,15 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write # mandatory for pushing tags and making GitHub Releases
+      pull-requests: read # to find the release pull request's merge commit
 
     steps:
+      - name: Refuse a ref other than main
+        if: github.ref != 'refs/heads/main'
+        run: |
+          echo "::error::This workflow releases what main carries. Dispatch it from main: a run on $GITHUB_REF could tag a release branch before its merge, and the merge would then find the tag taken."
+          exit 1
+
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0 # need the tag list to know what has already shipped
@@ -72,11 +86,34 @@ jobs:
         if: env.TAG_EXISTS == '1' && env.RELEASE_EXISTS == '1'
         run: echo "v$VERSION is already tagged and released — this push carried no version bump."
 
+      - name: Resolve the release commit
+        if: env.TAG_EXISTS != '1' || env.RELEASE_EXISTS != '1'
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          if [ "$TAG_EXISTS" = "1" ]; then
+            TARGET=$(git rev-list -n 1 "v$VERSION")
+            echo "v$VERSION is already on $TARGET; only the Release is missing."
+          else
+            TARGET=$(gh pr list --repo "$GITHUB_REPOSITORY" --state merged --base main --head "release/v$VERSION" \
+              --json mergeCommit --jq '.[0].mergeCommit.oid // empty')
+            if [ -z "$TARGET" ]; then
+              echo "::error::The manifests declare $VERSION, which is not tagged, but no pull request from release/v$VERSION was merged into main — refusing to tag a commit no release pull request produced."
+              exit 1
+            fi
+            if ! git merge-base --is-ancestor "$TARGET" HEAD; then
+              echo "::error::The release pull request's merge commit $TARGET is not in main's history at $(git rev-parse HEAD) — refusing to tag."
+              exit 1
+            fi
+            echo "The release pull request for v$VERSION merged as $TARGET."
+          fi
+          echo "TARGET=$TARGET" >> "$GITHUB_ENV"
+
       - name: Verify changelog entry exists
         if: env.TAG_EXISTS != '1' || env.RELEASE_EXISTS != '1'
         run: |
-          if ! grep -q "^## \[v$VERSION\] - " CHANGELOG.md; then
-            echo "::error::No changelog entry for v$VERSION in CHANGELOG.md — refusing to tag."
+          if ! git show "$TARGET:CHANGELOG.md" | grep -q "^## \[v$VERSION\] - "; then
+            echo "::error::No changelog entry for v$VERSION in CHANGELOG.md at $TARGET — refusing to tag."
             exit 1
           fi
 
@@ -85,20 +122,22 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git tag -a "v$VERSION" -m "Library snapshot v$VERSION"
+          git tag -a "v$VERSION" "$TARGET" -m "Library snapshot v$VERSION"
           git push origin "v$VERSION"
-          echo "Tagged $(git rev-parse --short HEAD) as v$VERSION"
+          echo "Tagged $(git rev-parse --short "$TARGET") as v$VERSION"
 
       - name: Extract changelog notes for this version
         if: env.RELEASE_EXISTS != '1'
         run: |
-          START_LINE=$(grep -n "^## \[v$VERSION\] - " CHANGELOG.md | cut -d: -f1)
-          NEXT_VERSION_LINE=$(tail -n +$((START_LINE + 1)) CHANGELOG.md | grep -n "^## \[v.*\] - " | head -1 | cut -d: -f1)
+          git show "$TARGET:CHANGELOG.md" > "$RUNNER_TEMP/CHANGELOG.md"
+          CHANGELOG="$RUNNER_TEMP/CHANGELOG.md"
+          START_LINE=$(grep -n "^## \[v$VERSION\] - " "$CHANGELOG" | cut -d: -f1)
+          NEXT_VERSION_LINE=$(tail -n +$((START_LINE + 1)) "$CHANGELOG" | grep -n "^## \[v.*\] - " | head -1 | cut -d: -f1)
 
           if [ -z "$NEXT_VERSION_LINE" ]; then
-            NOTES=$(tail -n +$((START_LINE + 1)) CHANGELOG.md)
+            NOTES=$(tail -n +$((START_LINE + 1)) "$CHANGELOG")
           else
-            NOTES=$(sed -n "$((START_LINE + 1)),$((START_LINE + NEXT_VERSION_LINE - 1))p" CHANGELOG.md)
+            NOTES=$(sed -n "$((START_LINE + 1)),$((START_LINE + NEXT_VERSION_LINE - 1))p" "$CHANGELOG")
           fi
 
           {
