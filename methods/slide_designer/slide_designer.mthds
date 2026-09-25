@@ -186,7 +186,7 @@ description = "Generate a visual mockup image from a theme"
 inputs = { theme = "Theme" }
 output = "Image"
 aspect_ratio = "landscape_16_9"
-model = "nano-banana-pro"
+model = "@default-premium"
 prompt = """
 Render a composition of 4 slide mockups based on the following theme:
 
