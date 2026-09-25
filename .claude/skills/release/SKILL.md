@@ -3,20 +3,20 @@ name: release
 description: >
   Cut a release of methods, the public MTHDS method library at
   github.com/Pipelex/methods: the release/vX.Y.Z worktree, the lockstep bump of
-  every methods/*/METHODS.toml, the changelog entry, the format, lint and
-  validation gates, one commit, and a pull request to main whose merge creates
-  the annotated vX.Y.Z tag every pinned address resolves against. Use when the
-  user says "release", "cut a release", "bump version", "prepare a release",
-  "new version", "make a release", "ship it", "create release branch",
-  "promote dev to main", "tag the library", "snapshot the library", or wants a
-  change reachable at a new @vX.Y.Z address. Changelog content passed inline
-  ("/release Added a contract review method") becomes the entry. The merge is
-  landed by /ledger-land, never by this skill.
+  every methods/*/METHODS.toml, the changelog entry, the format, lint,
+  validation and sample gates, one commit, and a pull request to main whose
+  merge creates the annotated vX.Y.Z tag every pinned address resolves against.
+  Use when the user says "release", "cut a release", "bump version", "prepare a
+  release", "new version", "make a release", "ship it", "create release
+  branch", "promote dev to main", "tag the library", "snapshot the library", or
+  wants a change reachable at a new @vX.Y.Z address. Changelog content passed
+  inline ("/release Added a contract review method") becomes the entry. The
+  merge is landed by /ledger-land, never by this skill.
 ---
 
 # Releasing the method library
 
-The procedure is the workspace release play, [`docs/workspace/releasing.md`](../../../../docs/workspace/releasing.md) at the workspace root — `../docs/workspace/releasing.md` from this repo's own root, which resolves the same from the main checkout and from any worktree. Read it first, then run it with what follows. The repo key is `methods`, the base is `dev`, and the pull request targets `main`. The release worktree is `_methods--release`, made with `wt add methods release --branch release/vX.Y.Z`. The repo declares no `.worktree.toml`, no `.worktreeinclude` and no Makefile, so `wt` resolves the base from `origin/dev` and provisions nothing: the gates run with the `pipelex` and `plxt` installed on the machine. The repo's own account of the scheme, the workflows and why they are built as they are is [`docs/releasing.md`](../../../docs/releasing.md).
+The procedure is the workspace release play, [`docs/workspace/releasing.md`](../../../../docs/workspace/releasing.md) at the workspace root — `../docs/workspace/releasing.md` from this repo's own root, which resolves the same from the main checkout and from any worktree. Read it first, then run it with what follows. The repo key is `methods`, the base is `dev`, and the pull request targets `main`. The release worktree is `_methods--release`, made with `wt add methods release --branch release/vX.Y.Z`. The repo declares no `.worktree.toml`, no `.worktreeinclude` and no Makefile, so `wt` resolves the base from `origin/dev` and provisions nothing: the gates run with the `pipelex`, `plxt`, `curl` and `jq` installed on the machine. The repo's own account of the scheme, the workflows and why they are built as they are is [`docs/releasing.md`](../../../docs/releasing.md).
 
 ## What ships
 
@@ -52,6 +52,7 @@ Run at the root of the worktree, in this order. Every one is blocking.
 1. **Lockstep** — `grep -h '^version = ' methods/*/METHODS.toml | sort -u` must print exactly one line. Before the bump that line is the previous release's version, and a second line means a package reached `dev` declaring another one; the bump cures it, since it rewrites every manifest. **After the bump** it runs again and must print exactly `version = "X.Y.Z"`.
 2. **Format and lint** — `plxt fmt --check`, then `plxt lint`, over every `.mthds` bundle and `METHODS.toml`. The repo carries no `plxt` configuration, so `plxt` reads the machine's own, `~/.pipelex/plxt.toml` when there is one. A red format check is cured by `plxt fmt`, which rewrites, and whatever it touched joins the release commit. A red lint is a bundle to fix on `dev` through an ordinary branch before the release is cut again.
 3. **Every package validates** — `for d in methods/*/; do pipelex validate bundle "$d" >/dev/null || echo "✗ $d"; done` prints nothing when every package passes; re-run a failing one without the redirect to read why. It is the static validation and dry run the README asks of every contribution, and it spends no inference. A red package is fixed on `dev` through an ordinary branch, never inside the release commit.
+4. **Every sample resolves** — `.claude/skills/release/scripts/check-samples.sh` reads every `url` in every `methods/*/inputs.json` and must print `✓` for each one. It refuses by name a host under a reserved domain (`.invalid`, `.test`, `.example`, `.localhost`, `example.com` and its siblings), which is what a generated inputs template leaves behind, and a `raw.githubusercontent.com` link whose ref is not a `v*` tag; it asks every other URL for its first byte and wants a `2xx`. It needs `curl` and `jq`, no API key, and spends no inference. Validation never fetches a sample, which is how `doc_summarizer` shipped a placeholder from `v0.1.0` to `v0.1.3`, and a tag freezes its samples for good. A red sample is fixed on `dev` through an ordinary branch, never inside the release commit.
 
 ## The release commit
 

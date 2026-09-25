@@ -1,0 +1,119 @@
+#!/usr/bin/env bash
+# Check that every URL a sample inputs.json links answers.
+#
+#   check-samples.sh [inputs.json ...]
+#
+# With no argument it reads every methods/*/inputs.json of the checkout the
+# script lives in, wherever it is run from; name files to check those instead.
+# It takes every `url` value in each file, at any depth, and refuses one that
+# is not an http(s) URL, one whose host is under a domain reserved for
+# documentation and testing (.invalid, .test, .example, .localhost, and
+# example.com, example.net, example.org), which is what a generated inputs
+# template's placeholder looks like, and a raw.githubusercontent.com URL whose
+# ref is not a v* tag, since a sample must not change under a library tag.
+# Every other URL must answer a request for its first byte with a 2xx. No call
+# spends inference. Prints one line per URL, and one per file jq cannot read,
+# and exits non-zero when any line is a failure.
+#
+# Needs curl and jq.
+
+set -euo pipefail
+
+for arg in "$@"; do
+  if [[ "$arg" == -* ]]; then
+    echo "usage: $0 [inputs.json ...]" >&2
+    exit 2
+  fi
+  [ -f "$arg" ] || { echo "$arg: no such file" >&2; exit 2; }
+done
+for tool in curl jq; do
+  command -v "$tool" >/dev/null || { echo "$tool is required" >&2; exit 2; }
+done
+
+if [ "$#" -eq 0 ]; then
+  cd "$(dirname "$0")/../../../.."
+  shopt -s nullglob
+  set -- methods/*/inputs.json
+  shopt -u nullglob
+fi
+
+errors=$(mktemp)
+trap 'rm -f "$errors"' EXIT
+failures=0
+
+# Why a URL is refused before anything fetches it, or nothing when it is not.
+refusal() {
+  local url=$1 rest host owner repo ref kind name
+  if [[ ! "$url" =~ ^[Hh][Tt][Tt][Pp][Ss]?:// ]]; then
+    echo "not an http(s) URL, so the hosted API cannot fetch it"
+    return
+  fi
+  rest=${url#*://}
+  host=${rest%%[/?#]*}
+  host=${host##*@}
+  host=${host%:*}
+  host=$(printf '%s' "$host" | tr '[:upper:]' '[:lower:]')
+  host=${host%.}
+  case "$host" in
+    invalid | *.invalid | test | *.test | example | *.example)
+      echo "$host is under a reserved top-level domain that never resolves: a placeholder, not a sample"
+      return
+      ;;
+    localhost | *.localhost)
+      echo "$host is the machine making the request, never a public host: a placeholder, not a sample"
+      return
+      ;;
+    example.com | *.example.com | example.net | *.example.net | example.org | *.example.org)
+      echo "$host is a reserved example domain: a placeholder, not a sample"
+      return
+      ;;
+  esac
+  if [ "$host" = raw.githubusercontent.com ]; then
+    # The path is /<owner>/<repo>/<ref>/<file>, the ref possibly spelled refs/tags/<tag>.
+    IFS=/ read -r owner repo ref kind name _ <<<"${rest#*/}"
+    if [ "$ref" = refs ]; then
+      if [ "$kind" != tags ]; then
+        echo "names refs/$kind/$name, which is not a tag, so the file can change under a library tag: link it at a v* tag of $owner/$repo"
+        return
+      fi
+      ref=$name
+    fi
+    if [[ ! "$ref" =~ ^v[0-9] ]]; then
+      echo "names the ref '$ref', which is not a v* tag, so the file can change under a library tag: link it at a v* tag of $owner/$repo"
+      return
+    fi
+  fi
+}
+
+for file in "$@"; do
+  if ! urls=$(jq -r '.. | objects | .url? | strings' "$file" 2>"$errors"); then
+    echo "✗ $file — not valid JSON: $(head -n 1 "$errors")"
+    failures=$((failures + 1))
+    continue
+  fi
+  while IFS= read -r url; do
+    [ -n "$url" ] || continue
+    reason=$(refusal "$url")
+    if [ -n "$reason" ]; then
+      echo "✗ $file: $url — $reason"
+      failures=$((failures + 1))
+      continue
+    fi
+    if code=$(curl -sSL -r 0-0 --max-time 30 --retry 2 -o /dev/null -w '%{http_code}' "$url" 2>"$errors"); then
+      if [[ "$code" == 2?? ]]; then
+        echo "✓ $file: $url"
+      else
+        echo "✗ $file: $url — HTTP $code"
+        failures=$((failures + 1))
+      fi
+    else
+      echo "✗ $file: $url — $(head -n 1 "$errors")"
+      failures=$((failures + 1))
+    fi
+  done <<<"$urls"
+done
+
+if [ "$failures" -ne 0 ]; then
+  echo "$failures sample check(s) failed" >&2
+  exit 1
+fi
