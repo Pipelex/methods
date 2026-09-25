@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [v0.1.3] - 2026-09-25
 
 ### Added
 
@@ -8,7 +8,7 @@
 
 ### Changed
 
-- **Every model goes through the standard model deck**: `image_generation`'s image pipes use `@default-general` instead of `nano-banana-2`, `slide_designer`'s mockup renderer uses `@default-premium` instead of `nano-banana-pro`, and `documents`' markdown extraction uses `@default-extract-document` instead of `azure-document-intelligence`, so no method in the library names a model outright.
+- **Every model goes through the standard model deck**: `image_generation`'s image pipes use `@default-general` instead of `nano-banana-2`, `slide_designer`'s mockup renderer uses `@default-premium` instead of `nano-banana-pro`, and `documents`' markdown extraction uses `@default-extract-document` instead of `azure-document-intelligence`, so no method in the library names a model outright. Run at `@v0.1.3`, these pipes use whichever model the deck assigns to each alias, which can differ from the model they named at `v0.1.2`.
 
 ## [v0.1.2] - 2026-09-25
 
