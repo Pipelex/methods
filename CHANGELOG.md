@@ -1,5 +1,11 @@
 # Changelog
 
+## [v0.1.4] - 2026-09-25
+
+### Fixed
+
+- **`doc_summarizer`'s sample document**: its `inputs.json` links a real document, the cookbook's CatOps pitch deck at the cookbook's `v0.18.0` tag, where it named a placeholder host that never resolves. At `v0.1.3` and earlier the sample does not run: run it at `@v0.1.4` or later.
+
 ## [v0.1.3] - 2026-09-25
 
 ### Added
