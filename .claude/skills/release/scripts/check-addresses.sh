@@ -31,6 +31,13 @@ done
 BASE_URL="${PIPELEX_BASE_URL:-https://api.pipelex.com}"
 failures=0
 
+# The first `<key> = "…"` (or '…') line of a manifest, or nothing. It must not
+# fail when the key is absent: `name` is optional in the MTHDS schema, and a
+# package without one is exactly what this check has to report.
+field() {
+  printf '%s\n' "$2" | sed -nE "/^$1 = /{s/^$1 = [\"']([^\"']*)[\"'].*/\1/p;q;}"
+}
+
 git fetch --quiet --tags origin
 if ! git rev-parse -q --verify "refs/tags/$TAG" >/dev/null; then
   echo "$TAG is not a tag on origin yet: the release workflow has not tagged it" >&2
@@ -40,8 +47,13 @@ fi
 manifests=$(git ls-tree -r --name-only "$TAG" -- methods/ | grep '/METHODS\.toml$')
 for manifest in $manifests; do
   text=$(git show "$TAG:$manifest")
-  name=$(printf '%s\n' "$text" | grep -m 1 '^name = ' | cut -d '"' -f 2)
-  address=$(printf '%s\n' "$text" | grep -m 1 '^address = ' | cut -d '"' -f 2)
+  name=$(field name "$text")
+  address=$(field address "$text")
+  if [ -z "$name" ] || [ -z "$address" ]; then
+    echo "✗ $manifest — declares no name or no address, so no address reaches the package"
+    failures=$((failures + 1))
+    continue
+  fi
   method_ref="$address/$name@$TAG"
   body=$(jq -n --arg ref "$method_ref" '{method_ref: $ref}')
   response=$(curl -sS -X POST "$BASE_URL/v1/validate" \
