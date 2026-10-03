@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- **`image_card`**: generates an image from a text description with the deck's small image generation model, `@default-small`, and presents the image and its description side by side in an HTML page. Its entry pipe, `generate_image_card`, takes a `description` text, like `image_generation_fast`'s `generate_image`, and returns an `Html` page. The page links the image by its storage URL, so where signed URLs are configured the image stops showing once the link expires.
+
 ## [v0.1.5] - 2026-10-03
 
 ### Added
