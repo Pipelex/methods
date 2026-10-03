@@ -1,0 +1,13 @@
+[package]
+name = "image_card"
+display_name = "Image Card"
+address = "github.com/Pipelex/methods"
+version = "0.1.5"
+description = "Generate an image from a text description with a small, fast image model, and present the image and its description side by side in an HTML page."
+authors = ["Evotis S.A.S"]
+license = "MIT"
+mthds_version = ">=1.0.0"
+main_pipe = "generate_image_card"
+
+[exports.image_card]
+pipes = ["generate_image_card"]
