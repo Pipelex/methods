@@ -31,11 +31,14 @@ The landing verifies the publish from the run, the tag and the Release:
 
 ```bash
 gh run list --workflow=github-release.yml --branch main --limit 3 --json conclusion,headSha,url   # the run whose headSha is the merge SHA: success, or a later one if it was cancelled
-git -C <main> fetch --tags --prune origin && git -C <main> rev-list -n 1 vX.Y.Z                 # the tag, on the merge SHA
+git -C <main> fetch --tags --prune origin && git -C <main> tag --list vX.Y.Z                    # the tag
+git -C <main> rev-list -n 1 vX.Y.Z                                                               # on the merge SHA
 gh release view vX.Y.Z                                                                           # the Release and its notes
 ```
 
-Once the tag exists, the landing proves what the release is for: every package runs by its address at the tag. From `<main>`, with `PIPELEX_API_KEY` set, run `.claude/skills/release/scripts/check-addresses.sh vX.Y.Z`. It lists the packages the tag itself carries, asks the hosted API's `POST /v1/validate` to fetch and validate each one at `<address>/<name>@vX.Y.Z`, and spends no inference. Every line must read `✓`. A `✗` is a release that did not do its job, since the hosted fetch refuses that package at its own tag: report it with the line the script printed, and file the fix against `methods` as a bug discovered from the release item.
+The `git tag --list` line is the tag's declaration: `ledger land` holds the release to it, and `ledger new --after-release methods@X.Y.Z` reads this repo's releases in that spelling.
+
+Once the tag exists, the landing proves what the release is for: every package runs by its address at the tag. From `<main>`, with `PIPELEX_API_KEY` set, run `.claude/skills/release/scripts/check-addresses.sh vX.Y.Z`. It lists the packages the tag itself carries, asks the hosted API's `POST /v1/validate` to fetch and validate each one at `<address>/<name>@vX.Y.Z`, and spends no inference. Every line must read `✓`. A `✗` is a release that did not do its job, since the hosted fetch refuses that package at its own tag: report it with the line the script printed, and file the fix against `methods` as a `bug` that quotes that line.
 
 If the run failed, read its log before anything else. Its deliberate refusals, manifests that disagree and a missing changelog entry, are also what the pull request's checks assert, so either one reaching `main` means a check was bypassed. A failure from outside the repository is re-run with `gh run rerun <run id> --failed`, or, once `main` has moved on, with `gh workflow run github-release.yml --ref main`. The guards make either safe, since the tag lands on the merge commit whichever run creates it.
 
@@ -75,4 +78,4 @@ Both act only on a head matching `^release/v([0-9]+\.[0-9]+\.[0-9]+)$` and pass 
 - **The pull request body names the manifests.** The repo has no single version file, so the play's "Bumps version" line reads "Bumps every package manifest from `A.B.C` to `X.Y.Z`."
 - **Consumers pin library tags, and a release moves none of them.** The cookbook, both starters, the method-app template, the plugins and the MCP name addresses at tags of this library in their docs, samples and tests. When a release fixes something one of them pins, as `v0.1.2` did for `table_extraction`'s sample, file the move against that repo; whether and when it moves is that repo's call.
 - **The skill, the docs page and the workflows move together.** This skill, `docs/releasing.md` and the workflows in `.github/workflows/` state the same rules; a change to one of them changes the others in the same commit.
-- **No release follow-ups are armed.** `ledger.toml` declares no `release_followups` for `methods`, so filing the release item materializes no blocked tasks; anything a release owes another repo is filed by hand beside it.
+- **A release files nothing in the ledger.** Work another repo must do once this version ships, such as moving a pinned tag as the bullet above describes, is filed against that repo with `ledger new --after-release methods@X.Y.Z`, or linked onto an item already open with `ledger link <id> --after-release methods@X.Y.Z`, and becomes ready by itself once the `vX.Y.Z` tag is in this repo's checkout.
