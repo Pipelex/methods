@@ -1,0 +1,58 @@
+domain      = "image_card"
+description = "Generating an image from a text description and presenting the two side by side in an HTML page"
+main_pipe   = "generate_image_card"
+
+[pipe.generate_image_card]
+type = "PipeSequence"
+description = """
+Generate an image from a text description with a small and fast image generation model, then present the image and its description side by side in an HTML page.
+"""
+inputs = { description = "Text" }
+output = "Html"
+steps = [
+  { pipe = "generate_image", result = "image" },
+  { pipe = "compose_image_card", result = "image_card" },
+]
+
+# The same pipe as image_generation_fast's generate_image, inlined because a package must not reference another package's pipes.
+[pipe.generate_image]
+type        = "PipeImgGen"
+description = "Generate an image directly from a text description, with a small and fast image generation model"
+inputs      = { description = "Text" }
+output      = "Image"
+prompt      = "$description"
+model       = "@default-small"
+
+[pipe.compose_image_card]
+type        = "PipeCompose"
+description = "Present an image and its description side by side in an HTML page"
+inputs      = { description = "Text", image = "Image" }
+output      = "Html"
+
+[pipe.compose_image_card.template]
+category = "html"
+template = """
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Image card</title>
+  <style>
+    body { margin: 0; padding: 40px 16px; font-family: 'Segoe UI', Arial, sans-serif; background: #f5f5f5; color: #2c3e50; }
+    .card { display: flex; flex-wrap: wrap; align-items: center; gap: 32px; max-width: 1100px; margin: 0 auto; padding: 32px; background: white; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+    .card-image, .card-description { flex: 1 1 320px; min-width: 0; }
+    .card-image img { display: block; width: 100%; height: auto; border-radius: 8px; }
+    .card-description { margin: 0; font-size: 1.15em; line-height: 1.6; white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <div class="card-image">
+      <img src="{{ image.public_url }}" alt="{{ description }}">
+    </div>
+    <p class="card-description">{{ description }}</p>
+  </main>
+</body>
+</html>
+"""
