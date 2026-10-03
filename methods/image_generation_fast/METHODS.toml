@@ -1,0 +1,13 @@
+[package]
+name = "image_generation_fast"
+display_name = "Image Generation Fast"
+address = "github.com/Pipelex/methods"
+version = "0.1.5"
+description = "Fast image generation: render a text description directly with a small image generation model."
+authors = ["Evotis S.A.S"]
+license = "MIT"
+mthds_version = ">=1.0.0"
+main_pipe = "generate_image"
+
+[exports.image_generation_fast]
+pipes = ["generate_image"]
