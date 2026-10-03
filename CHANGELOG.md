@@ -4,7 +4,7 @@
 
 ### Added
 
-- **`image_generation_fast`**: generates an image directly from a text prompt with the deck's small image generation model, `@default-small`, trading quality for speed and cost. Its entry pipe, `generate_image`, takes a `prompt` text and returns an `Image`.
+- **`image_generation_fast`**: generates an image directly from a text description with the deck's small image generation model, `@default-small`, trading quality for speed and cost. Its entry pipe, `generate_image`, takes a `description` text and returns an `Image`, like `image_generation`'s pipe of the same name, so the two are interchangeable.
 
 ## [v0.1.4] - 2026-09-25
 

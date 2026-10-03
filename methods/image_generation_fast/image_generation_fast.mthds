@@ -1,10 +1,10 @@
 domain      = "image_generation_fast"
-description = "Generating images quickly from a text prompt, with a small image generation model"
+description = "Generating images quickly from a text description, with a small image generation model"
 
 [pipe.generate_image]
 type        = "PipeImgGen"
-description = "Generate an image directly from a text prompt, with a small and fast image generation model"
-inputs      = { prompt = "Text" }
+description = "Generate an image directly from a text description, with a small and fast image generation model"
+inputs      = { description = "Text" }
 output      = "Image"
-prompt      = "$prompt"
+prompt      = "$description"
 model       = "@default-small"

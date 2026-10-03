@@ -13,7 +13,7 @@ This repository is the public library of packaged [MTHDS](https://mthds.ai) meth
 | [`table_extraction`](methods/table_extraction/) | Turn a screenshot of a table into faithful HTML, with a vision review pass to correct text and formatting | `extract_html_table_and_review` |
 | [`slide_designer`](methods/slide_designer/) | Turn a rough slide-deck brief into design proposals: multiple visual themes, a rendered mockup image for each, and an HTML report presenting them all | `generate_design_proposals_from_rough_brief` |
 | [`image_generation`](methods/image_generation/) | Generate images from text: render a description directly, or refine it into an optimized image prompt first | `illustrate` |
-| [`image_generation_fast`](methods/image_generation_fast/) | Generate an image quickly: render a text prompt directly with a small, fast image generation model | `generate_image` |
+| [`image_generation_fast`](methods/image_generation_fast/) | Generate an image quickly: render a description directly with a small, fast image generation model | `generate_image` |
 | [`tweet_optimizer`](methods/tweet_optimizer/) | Score a draft tech tweet for fluffiness, cringiness, humblebragging and vagueness, then rewrite it in your own writing style | `optimize_tweet_sequence` |
 | [`text_stats`](methods/text_stats/) | Deterministic text statistics computed by a sandboxed Python function (PipeFunc, no LLM): counts, vocabulary richness, most frequent words, and estimated reading and speaking times, as a Markdown report | `analyze_text` |
 
