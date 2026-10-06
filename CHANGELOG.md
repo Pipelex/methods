@@ -1,10 +1,10 @@
 # Changelog
 
-## [Unreleased]
+## [v0.1.7] - 2026-10-06
 
 ### Changed
 
-- **`invoice_extraction` declares no dotted input name**: the internal pipe `extract_invoice_data` drops its redundant input key `"invoice_page.page_view" = "Image"` and keeps `invoice_page = "Page"`, while its prompt still reads the page view through the root as `$invoice_page.page_view`. The root already set the input's concept, so the method runs exactly as before, and it keeps validating once Pipelex refuses dotted input names with `invalid_input_name`.
+- **`invoice_extraction` declares no dotted input name**: the internal pipe `extract_invoice_data` drops its redundant input key `"invoice_page.page_view" = "Image"` and keeps `invoice_page = "Page"`, while its prompt still reads the page view through the root as `$invoice_page.page_view`. The root already set the input's concept, so the method runs exactly as before, and it keeps validating once Pipelex refuses dotted input names with `invalid_input_name`. At `v0.1.6` and earlier the package still declares the dotted key and stops validating under that refusal: run it at `@v0.1.7` or later.
 
 ## [v0.1.6] - 2026-10-03
 

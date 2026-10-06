@@ -2,7 +2,7 @@
 name = "image_generation_fast"
 display_name = "Image Generation Fast"
 address = "github.com/Pipelex/methods"
-version = "0.1.6"
+version = "0.1.7"
 description = "Fast image generation: render a text description directly with a small image generation model."
 authors = ["Evotis S.A.S"]
 license = "MIT"
