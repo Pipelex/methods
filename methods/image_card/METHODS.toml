@@ -2,7 +2,7 @@
 name = "image_card"
 display_name = "Image Card"
 address = "github.com/Pipelex/methods"
-version = "0.1.6"
+version = "0.1.7"
 description = "Generate an image from a text description with a small, fast image model, and present the image and its description side by side in an HTML page."
 authors = ["Evotis S.A.S"]
 license = "MIT"
