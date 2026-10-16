@@ -13,7 +13,7 @@ The `v` prefix appears in branch names, changelog headings and tags, never in a 
 
 ## What counts as breaking
 
-The library is pre-1.0, so a breaking change is a **minor** and everything else a **patch**. A change is breaking when it breaks a caller who moves an address from the previous tag to the new one: a package renamed or removed, an exported pipe renamed, removed or no longer exported, a `main_pipe` changed, or the inputs or output concept of an exported pipe changed. A new package, a new pipe, a better prompt, a model moved to a deck alias or a fixed sample is a patch. Pre-release forms (`-rc.1`) are not used: a tag is something any address can pin.
+The library is pre-1.0, so a breaking change is a **minor** and everything else a **patch**. A change is breaking when it breaks a caller who moves an address from the previous tag to the new one: a package renamed or removed, an exported pipe renamed, removed or no longer exported, a `main_pipe` changed, the inputs or output concept of an exported pipe changed, or a package that stops running on a Pipelex release the previous tag ran on. A new package, a new pipe, a better prompt, a model moved to a deck alias or a fixed sample is a patch. Pre-release forms (`-rc.1`) are not used: a tag is something any address can pin.
 
 ## Cutting a release
 
