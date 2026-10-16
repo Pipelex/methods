@@ -1,10 +1,10 @@
 # Changelog
 
-## [Unreleased]
+## [v0.2.0] - 2026-10-16
 
 ### Changed
 
-- **`text_stats` names its function by import path (Breaking)**: the `PipeFunc` step `analyze_text` names its Python function `text_stats_funcs.text_stats_report`, its import path from the package's root, instead of `text_stats_report`, and the report it writes is unchanged. The package now runs only on a Pipelex release later than 0.86.1, which names a `PipeFunc`'s function by import path and refuses a flat name, while Pipelex 0.86.1 and earlier refuse the new name as a function missing from their registry. On those older releases, run `text_stats` at `@v0.1.7` or earlier.
+- **`text_stats` names its function by import path (Breaking)**: the `PipeFunc` step `analyze_text` names its Python function `text_stats_funcs.text_stats_report`, its import path from the package's root, instead of `text_stats_report`, and the report it writes is unchanged. The package now runs only on Pipelex 0.87.0 or later, which names a `PipeFunc`'s function by import path and refuses a flat name, while Pipelex 0.86.1 and earlier refuse the new name as a function missing from their registry. On those older releases, run `text_stats` at `@v0.1.7` or earlier.
 
 ## [v0.1.7] - 2026-10-06
 
