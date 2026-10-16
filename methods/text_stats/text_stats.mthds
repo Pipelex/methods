@@ -7,4 +7,4 @@ type          = "PipeFunc"
 description   = "Compute deterministic statistics about the input text (counts, averages, top words, reading time) and format them as a Markdown report."
 inputs        = { text = "Text" }
 output        = "Text"
-function_name = "text_stats_report"
+function_name = "text_stats_funcs.text_stats_report"
