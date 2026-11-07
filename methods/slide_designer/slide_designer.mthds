@@ -1,5 +1,5 @@
 domain      = "slide_designer"
-description = "Data model for slide prompt generation with reusable themes"
+description = "Turning a rough slide-deck brief into design proposals, each a visual theme paired with a mockup drawn in it for the deck's own title"
 main_pipe   = "generate_design_proposals_from_rough_brief"
 
 # Input concept for design brief
@@ -84,50 +84,49 @@ layout     = { type = "concept", concept_ref = "LayoutSettings", description = "
 style      = { type = "concept", concept_ref = "StyleSettings", description = "Visual style settings", required = true }
 exclusions = { type = "text", description = "Elements to avoid in the design (e.g., no gradients, no stock photos)" }
 
-# Slide content concept
-
-[concept.Slide]
-description = "Content definition for a single slide"
-
-[concept.Slide.structure]
-slide_type = { type = "text", description = "Type of slide layout", required = true, choices = [
-  "title",
-  "content",
-  "comparison",
-  "process",
-  "infographic",
-  "quote",
-  "closing",
-] }
-title = { type = "text", description = "Slide title", required = true }
-subtitle = { type = "text", description = "Optional subtitle or tagline" }
-content = { type = "text", description = "Main content or bullet points for the slide", required = true }
-graphics = { type = "text", description = "Description of visual elements or graphics to include" }
-layout_override = { type = "text", description = "Optional layout override for this specific slide" }
-
 # Output concepts
 
-[concept.SlidePrompt]
-description = "Generated image prompt ready for slide image generation"
-refines     = "Text"
+[concept.DesignProposal]
+description = "One design proposal for a deck: a visual theme and a mockup of the deck drawn in it"
+
+[concept.DesignProposal.structure]
+theme  = { type = "concept", concept_ref = "Theme", description = "The proposal's theme: palette, typography, layout and style", required = true }
+mockup = { type = "concept", concept_ref = "Image", description = "Four slides of the deck drawn in the theme, the title slide carrying the brief's topic word for word", required = true }
+
+[concept.DesignProposals]
+description = "The design proposals for a deck: the polished brief they answer, and the proposals, each a theme paired with its mockup"
+
+[concept.DesignProposals.structure]
+brief     = { type = "concept", concept_ref = "SlideDesignBrief", description = "The brief as polished: the topic as given, with the tone, goal and audience filled in", required = true }
+proposals = { type = "list", item_type = "concept", item_concept_ref = "DesignProposal", description = "The proposals, one per theme", required = true }
 
 # Pipes
 
 [pipe.generate_design_proposals_from_rough_brief]
 type = "PipeSequence"
-description = "Transform a design brief into multiple themes with visual mockups and HTML report"
+description = "Turn a rough deck brief into design proposals: polish the brief, imagine several themes, and draw in each a mockup titled with the deck's own topic, each theme paired with its mockup"
 inputs = { brief = "SlideDesignBrief" }
-output = "Html"
+output = "DesignProposals"
 steps = [
   { pipe = "polish_brief", result = "polished_brief" },
   { pipe = "generate_multiple_themes", nb_output = 3, result = "themes" },
-  { pipe = "render_visual_proposal", batch_over = "themes", batch_as = "theme", result = "design_proposals" },
+  { pipe = "draft_proposal", batch_over = "themes", batch_as = "theme", result = "proposals" },
+  { pipe = "assemble_proposals", result = "design_proposals" },
+]
+
+[pipe.generate_design_proposals_report]
+type = "PipeSequence"
+description = "Turn a rough deck brief into design proposals and present them in an HTML report, each mockup in one card with its own theme"
+inputs = { brief = "SlideDesignBrief" }
+output = "Html"
+steps = [
+  { pipe = "generate_design_proposals_from_rough_brief", result = "design_proposals" },
   { pipe = "compose_proposals_report", result = "proposals_report" },
 ]
 
 [pipe.polish_brief]
 type = "PipeLLM"
-description = "Polish and complete a slide design brief by filling missing fields"
+description = "Polish and complete a slide design brief by filling missing fields, keeping the topic word for word"
 inputs = { brief = "SlideDesignBrief" }
 output = "SlideDesignBrief"
 prompt = """
@@ -136,17 +135,18 @@ You are a professional presentation design consultant. Review this client brief 
 @brief
 
 Your task:
-1. Keep all provided information, but refine the wording if needed for clarity
-2. For any missing fields, infer sensible defaults based on the topic and any other provided context
-3. Ensure tone, goal, and audience are filled in with the most appropriate choice
-4. If brand_guidelines are missing, leave them empty (do not invent specific colors or fonts)
+1. Keep the topic exactly as written, word for word: it is the deck's title, and the slides show it as given
+2. Keep all other provided information, but refine its wording if needed for clarity
+3. For any missing fields, infer sensible defaults based on the topic and any other provided context
+4. Ensure tone, goal, and audience are filled in with the most appropriate choice
+5. If brand_guidelines are missing, leave them empty (do not invent specific colors or fonts)
 
 Return a complete, polished brief.
 """
 
 [pipe.generate_multiple_themes]
 type = "PipeLLM"
-description = "Generate a presentation theme from a polished design brief"
+description = "Generate several presentation themes from a polished design brief"
 inputs = { polished_brief = "SlideDesignBrief" }
 output = "Theme[]"
 prompt = """
@@ -180,33 +180,69 @@ Generate a complete theme with:
 6. **Exclusions**: Things to avoid based on the brief context
 """
 
+[pipe.draft_proposal]
+type = "PipeSequence"
+description = "Draw the deck's mockup in one theme and pair the theme with it"
+inputs = { theme = "Theme", polished_brief = "SlideDesignBrief" }
+output = "DesignProposal"
+steps = [
+  { pipe = "render_visual_proposal", result = "mockup" },
+  { pipe = "pair_proposal", result = "proposal" },
+]
+
 [pipe.render_visual_proposal]
 type = "PipeImgGen"
-description = "Generate a visual mockup image from a theme"
-inputs = { theme = "Theme" }
+description = "Draw a mockup of four slides of the deck in one theme, its title slide carrying the brief's topic word for word"
+inputs = { theme = "Theme", polished_brief = "SlideDesignBrief" }
 output = "Image"
 aspect_ratio = "landscape_16_9"
 model = "@default-premium"
 prompt = """
-Render a composition of 4 slide mockups based on the following theme:
+Render a composition of 4 slide mockups for a presentation whose title is: $polished_brief.topic
+
+The presentation's audience: $polished_brief.audience. Its goal: $polished_brief.goal.
+
+Design all four slides in the following theme:
 
 $theme
 
 ---
 
 The composition should be a grid of 4 slides, each with the following layout:
-- Title slide
+- Title slide, showing the presentation's title exactly as given above, word for word
 - Content slide
 - Comparison slide
 - Process slide
 
+Give the content, comparison and process slides headings and placeholder content that fit the presentation's topic, its audience and its goal. Every slide stays on the presentation's own subject: name no date, period or subject that the title does not.
+
 Make the mosaic edge to edge, no space between the slides.
 """
 
+[pipe.pair_proposal]
+type        = "PipeCompose"
+description = "Pair a theme with the mockup drawn in it"
+inputs      = { theme = "Theme", mockup = "Image" }
+output      = "DesignProposal"
+
+[pipe.pair_proposal.construct]
+theme  = { from = "theme" }
+mockup = { from = "mockup" }
+
+[pipe.assemble_proposals]
+type        = "PipeCompose"
+description = "Gather the polished brief and the proposals into one result"
+inputs      = { polished_brief = "SlideDesignBrief", proposals = "DesignProposal[]" }
+output      = "DesignProposals"
+
+[pipe.assemble_proposals.construct]
+brief     = { from = "polished_brief" }
+proposals = { from = "proposals" }
+
 [pipe.compose_proposals_report]
 type        = "PipeCompose"
-description = "Generate an HTML report presenting the design proposals"
-inputs      = { brief = "SlideDesignBrief", polished_brief = "SlideDesignBrief", themes = "Theme[]", design_proposals = "Image[]" }
+description = "Present the design proposals in an HTML report, each mockup in one card with its own theme's details"
+inputs      = { brief = "SlideDesignBrief", design_proposals = "DesignProposals" }
 output      = "Html"
 
 [pipe.compose_proposals_report.template]
@@ -221,15 +257,15 @@ template = """
     h2 { color: #34495e; margin-top: 30px; }
     .brief-section { background: white; padding: 25px; border-radius: 10px; margin: 20px 0; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
     .brief-section h3 { color: #e74c3c; margin-top: 0; }
-    .proposals-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; margin-top: 30px; }
-    .proposal-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+    .proposal-card { display: grid; grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr); background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-top: 25px; }
     .proposal-card img { width: 100%; height: auto; display: block; }
     .theme-details { padding: 20px; }
     .theme-name { font-size: 1.3em; font-weight: bold; color: #2c3e50; margin-bottom: 15px; }
-    .color-swatches { display: flex; gap: 8px; margin: 10px 0; }
+    .color-swatches { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 15px; }
     .swatch { width: 30px; height: 30px; border-radius: 5px; border: 1px solid #ddd; }
     .detail-row { margin: 8px 0; font-size: 0.9em; }
     .detail-label { color: #7f8c8d; font-weight: 500; }
+    @media (max-width: 900px) { .proposal-card { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
@@ -245,7 +281,8 @@ template = """
     {% if brief.existing_references %}<p><strong>References:</strong> {{ brief.existing_references }}</p>{% endif %}
   </div>
 
-  {% if brief != polished_brief %}
+  {% set polished_brief = design_proposals.brief %}
+  {% if brief.topic != polished_brief.topic or brief.tone != polished_brief.tone or brief.goal != polished_brief.goal or brief.audience != polished_brief.audience or brief.brand_guidelines != polished_brief.brand_guidelines or brief.existing_references != polished_brief.existing_references %}
   <div class="brief-section">
     <h3>Enhanced Brief</h3>
     <p><strong>Topic:</strong> {{ polished_brief.topic }}</p>
@@ -258,32 +295,28 @@ template = """
   {% endif %}
 
   <h2>Design Proposals</h2>
-  <div class="proposals-grid">
-    {% for proposal in design_proposals %}
-    <div class="proposal-card">
-      <img src="{{ proposal.public_url }}" alt="Design proposal {{ loop.index }}">
-    </div>
-    {% endfor %}
-  </div>
-
-  <h2>Theme Details</h2>
-  <div class="proposals-grid">
-    {% for theme in themes %}
-    <div class="proposal-card">
-      <div class="theme-details">
-        <div class="theme-name">{{ theme.name }}</div>
-        <div class="color-swatches">
-          <div class="swatch" style="background: {{ theme.colors.primary }}" title="Primary"></div>
-          <div class="swatch" style="background: {{ theme.colors.secondary }}" title="Secondary"></div>
-          <div class="swatch" style="background: {{ theme.colors.accent }}" title="Accent"></div>
-        </div>
-        <div class="detail-row"><span class="detail-label">Font:</span> {{ theme.typography.font_family }}</div>
-        <div class="detail-row"><span class="detail-label">Style:</span> {{ theme.style.overall }}</div>
-        <div class="detail-row"><span class="detail-label">Layout:</span> {{ theme.layout.aspect_ratio }}</div>
+  {% for proposal in design_proposals.proposals %}
+  {% set theme = proposal.theme %}
+  <div class="proposal-card">
+    <img src="{{ proposal.mockup.public_url }}" alt="Mockup of the deck in the {{ theme.name }} theme">
+    <div class="theme-details">
+      <div class="theme-name">{{ theme.name }}</div>
+      <div class="color-swatches">
+        <div class="swatch" style="background: {{ theme.colors.primary }}" title="Primary: {{ theme.colors.primary }}"></div>
+        <div class="swatch" style="background: {{ theme.colors.secondary }}" title="Secondary: {{ theme.colors.secondary }}"></div>
+        <div class="swatch" style="background: {{ theme.colors.accent }}" title="Accent: {{ theme.colors.accent }}"></div>
+        <div class="swatch" style="background: {{ theme.colors.background }}" title="Background: {{ theme.colors.background }}"></div>
+        <div class="swatch" style="background: {{ theme.colors.text_primary }}" title="Text: {{ theme.colors.text_primary }}"></div>
       </div>
+      <div class="detail-row"><span class="detail-label">Font:</span> {{ theme.typography.font_family }}</div>
+      {% if theme.typography.heading_style %}<div class="detail-row"><span class="detail-label">Headings:</span> {{ theme.typography.heading_style }}</div>{% endif %}
+      <div class="detail-row"><span class="detail-label">Style:</span> {{ theme.style.overall }}</div>
+      {% if theme.style.graphic_style %}<div class="detail-row"><span class="detail-label">Graphics:</span> {{ theme.style.graphic_style }}</div>{% endif %}
+      <div class="detail-row"><span class="detail-label">Layout:</span> {{ theme.layout.aspect_ratio }}</div>
+      {% if theme.exclusions %}<div class="detail-row"><span class="detail-label">Avoids:</span> {{ theme.exclusions }}</div>{% endif %}
     </div>
-    {% endfor %}
   </div>
+  {% endfor %}
 </body>
 </html>
 """
