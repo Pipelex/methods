@@ -12,6 +12,15 @@ category = { type = "text", description = "The category of the invoice", choices
 ] }
 explanation = { type = "text", description = "Explanation of the classification" }
 
+[concept.InvoiceLineItem]
+description = "One priced line of an invoice or a receipt, as printed: a product, a service, a fee or a discount"
+
+[concept.InvoiceLineItem.structure]
+label      = { type = "text", description = "What the line is for, as printed: the product, service, fee or discount", required = true }
+quantity   = { type = "number", description = "How many units, or how much, as printed; may be fractional for a weighed or measured item. Empty when the line prints no quantity" }
+unit_price = { type = "number", description = "Price of one unit, in the invoice's currency, when the line prints it" }
+amount     = { type = "number", description = "Total of the line, in the invoice's currency, as printed; negative for a discount or a refund" }
+
 [concept.Invoice]
 description = "Invoice information extracted from text, supporting both formal bills and receipts"
 
@@ -20,17 +29,19 @@ invoice_id        = { type = "text", description = "Unique identifier for the in
 invoice_number    = { type = "text", description = "Invoice number as shown on the document" }
 issue_date        = { type = "date", description = "Date when the invoice was issued" }
 time              = { type = "text", description = "Time of the transaction if available" }
-amount_incl_tax   = { type = "number", description = "Total amount including taxes" }
-amount_excl_tax   = { type = "number", description = "Net amount excluding taxes" }
-vat_amount        = { type = "number", description = "Total VAT/tax amount" }
-vat_rates         = { type = "list", item_type = "number", description = "List of VAT rates applied" }
+amount_incl_tax   = { type = "number", description = "Total amount including taxes, in the invoice's currency" }
+amount_excl_tax   = { type = "number", description = "Net amount excluding taxes, in the invoice's currency" }
+vat_amount        = { type = "number", description = "Total VAT or tax amount, in the invoice's currency" }
+currency          = { type = "text", description = "ISO 4217 code of the currency every amount on the invoice is expressed in, three uppercase letters such as EUR, USD or GBP. Empty when the document does not determine it" }
+vat_rates         = { type = "list", item_type = "number", description = "VAT rates applied, as percentages: 20 for 20 %" }
 vendor            = { type = "text", description = "Name of the vendor/seller" }
 vendor_address    = { type = "text", description = "Complete address of the vendor" }
 vendor_siret      = { type = "text", description = "SIRET number of the vendor (French company registration)" }
 vendor_vat_number = { type = "text", description = "VAT registration number of the vendor" }
 company_name      = { type = "text", description = "Name of the purchasing company" }
 company_address   = { type = "text", description = "Address of the purchasing company" }
-description       = { type = "text", description = "Description of goods or services purchased" }
+description       = { type = "text", description = "One-line summary of what was purchased; the purchase line by line is in line_items" }
+line_items        = { type = "list", item_type = "concept", item_concept_ref = "invoice_extraction.InvoiceLineItem", description = "The priced lines of the invoice, in the order printed, fees and discounts included; never the subtotal, tax, total or payment lines" }
 category          = { type = "concept", concept_ref = "invoice_extraction.InvoiceDetails", description = "Category or type of expense" }
 text              = { type = "text", description = "Raw text extracted from the invoice" }
 
@@ -80,7 +91,13 @@ inputs = { invoice_details = "InvoiceDetails", invoice_page = "Page" }
 output = "Invoice"
 model = "$vision"
 prompt = """
-Extract invoice information from this invoice:
+Extract invoice information from this invoice.
+
+Currency: give the ISO 4217 code of the currency the amounts are expressed in. Take it from a currency code printed on the document; otherwise from a symbol that names one currency only, such as € or £; otherwise, for a symbol several currencies share, such as the dollar sign, the yen sign or kr, from where the document was issued, as the document itself shows it: the vendor's address, a city or a landmark in its name or header (an airport, a station), its phone number's format, its tax identifiers or the name its tax goes by. When nothing on the document settles it, leave the currency empty rather than guess.
+
+Line items: list every priced line of the itemized part of the document, in the order printed, including fees, deposits, surcharges, shipping and discounts, a discount or a refund having a negative amount. Never list the subtotal, tax, total, payment, tender or change lines. Take each line's quantity, unit price and amount as printed, leave out what the line does not print, and never compute a value the document does not show.
+
+Description: summarize what was purchased in one line, without listing the items.
 
 The category of this invoice is: $invoice_details.category.
 

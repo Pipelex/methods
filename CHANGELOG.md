@@ -1,5 +1,15 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- **`invoice_extraction` returns the currency and the line items**: each `Invoice` gains `currency`, the ISO 4217 code its amounts are expressed in, read from the document and left empty when the document does not determine it, and `line_items`, a list of the new `InvoiceLineItem` concept (`label`, `quantity`, `unit_price`, `amount`) holding every priced line in the order printed, fees and discounts included and the subtotal, tax, total and payment lines never. `description` becomes a one-line summary of the purchase, and every existing field keeps its name and its type, so a caller moving its address from `v0.2.0` keeps working.
+
+### Changed
+
+- **`invoice_extraction` states `vat_rates` as percentages**: a rate of 20 % reads `20`, where the field's description previously left the model free to answer `0.2`.
+
 ## [v0.2.0] - 2026-10-16
 
 ### Changed
