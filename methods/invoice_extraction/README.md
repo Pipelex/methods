@@ -31,7 +31,7 @@ A list of `Invoice`, **one per page** of the document. Each page is first classi
 | `amount_incl_tax` | number | The total including taxes, in `currency`. |
 | `amount_excl_tax` | number | The net amount excluding taxes, in `currency`. |
 | `vat_amount` | number | The total VAT or tax amount, in `currency`. |
-| `currency` | text | The ISO 4217 code of the currency every amount is expressed in, such as `EUR` or `USD`. Empty when the document does not determine it (see below). |
+| `currency` | text | The ISO 4217 code of the currency the invoice's totals and lines are expressed in, such as `EUR` or `USD`. Empty when the document does not determine it (see below). |
 | `vat_rates` | list of numbers | The VAT rates applied, as percentages: `20` for 20 %. |
 | `vendor` | text | The vendor's name. |
 | `vendor_address` | text | The vendor's address. |
@@ -57,13 +57,13 @@ Every field may be empty when the page does not show it.
 
 ## How the currency is determined
 
-The method reads the currency from the document and never assumes one. It takes, in this order:
+The method reads the currency from the document and never assumes one. It is the currency of the invoice's own amounts, its totals and its lines, and only what qualifies those amounts counts: a converted amount, an exchange rate or a card-payment line printed in another currency, such as a card slip in the cardholder's currency, is ignored. It takes, in this order:
 
-1. a currency code printed on the document, such as `EUR` or `CHF`;
-2. otherwise, a symbol that names one currency only, such as `€` or `₹`;
+1. a currency code the document gives for those amounts, beside them or in a statement such as "all prices in EUR";
+2. otherwise, a symbol printed with them that names one currency only, such as `€` or `₹`;
 3. otherwise, for a symbol several currencies share, such as `$`, `£`, `¥` or `kr`, where the document was issued, as the document itself shows it: the vendor's address, a city or a landmark in its name or header, its phone number's format, its tax identifiers or the name its tax goes by.
 
-When none of these settles it, `currency` stays empty: a missing currency is safer to display than a wrong one. A document is read as expressed in one currency; a second currency on it, such as a converted total, is not represented.
+When none of these settles it, or when the totals and lines are themselves in more than one currency, `currency` stays empty: a missing currency is safer to display than a wrong one. A second currency on the document, such as a converted total, is not represented.
 
 ## Which lines are line items
 

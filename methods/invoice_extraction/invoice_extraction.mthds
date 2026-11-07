@@ -32,7 +32,7 @@ time              = { type = "text", description = "Time of the transaction if a
 amount_incl_tax   = { type = "number", description = "Total amount including taxes, in the invoice's currency" }
 amount_excl_tax   = { type = "number", description = "Net amount excluding taxes, in the invoice's currency" }
 vat_amount        = { type = "number", description = "Total VAT or tax amount, in the invoice's currency" }
-currency          = { type = "text", description = "ISO 4217 code of the currency every amount on the invoice is expressed in, three uppercase letters such as EUR, USD or GBP. Empty when the document does not determine it" }
+currency          = { type = "text", description = "ISO 4217 code of the currency the invoice's totals and lines are expressed in, three uppercase letters such as EUR, USD or GBP; never the currency of a converted amount or of a card payment in another currency. Empty when the document does not determine it" }
 vat_rates         = { type = "list", item_type = "number", description = "VAT rates applied, as percentages: 20 for 20 %" }
 vendor            = { type = "text", description = "Name of the vendor/seller" }
 vendor_address    = { type = "text", description = "Complete address of the vendor" }
@@ -93,7 +93,7 @@ model = "$vision"
 prompt = """
 Extract invoice information from this invoice.
 
-Currency: give the ISO 4217 code of the currency the amounts are expressed in. Take it from a currency code printed on the document; otherwise from a symbol that names one currency only, such as € or ₹; otherwise, for a symbol several currencies share, such as the dollar sign, the pound sign, the yen sign or kr, from where the document was issued, as the document itself shows it: the vendor's address, a city or a landmark in its name or header (an airport, a station), its phone number's format, its tax identifiers or the name its tax goes by. When nothing on the document settles it, leave the currency empty rather than guess.
+Currency: give the ISO 4217 code of the currency the invoice's own amounts are expressed in, its totals and its lines. Read it only from what qualifies those amounts, never from a converted amount, an exchange rate or a card-payment line printed in another currency. Take it from a currency code the document gives for those amounts, beside them or in a statement such as "all prices in EUR"; otherwise from a symbol printed with them that names one currency only, such as € or ₹; otherwise, for a symbol several currencies share, such as the dollar sign, the pound sign, the yen sign or kr, from where the document was issued, as the document itself shows it: the vendor's address, a city or a landmark in its name or header (an airport, a station), its phone number's format, its tax identifiers or the name its tax goes by. When nothing on the document settles it, or when the totals and lines are themselves in more than one currency, leave the currency empty rather than guess.
 
 Line items: list every priced line of the document, in the order printed: each product or service, and each fee, deposit, surcharge, shipping charge or discount wherever it is printed, below the subtotal included, a discount or a refund having a negative amount. Never list the subtotal, tax, total, payment, tender or change lines, nor a line that only sums lines already listed, such as a subtotal per category. Take each line's quantity, unit price and amount as printed, leave out what the line does not print, and never compute a value the document does not show.
 
