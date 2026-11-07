@@ -60,14 +60,14 @@ Every field may be empty when the page does not show it.
 The method reads the currency from the document and never assumes one. It takes, in this order:
 
 1. a currency code printed on the document, such as `EUR` or `CHF`;
-2. otherwise, a symbol that names one currency only, such as `€` or `£`;
-3. otherwise, for a symbol several currencies share, such as `$`, `¥` or `kr`, where the document was issued, as the document itself shows it: the vendor's address, a city or a landmark in its name or header, its phone number's format, its tax identifiers or the name its tax goes by.
+2. otherwise, a symbol that names one currency only, such as `€` or `₹`;
+3. otherwise, for a symbol several currencies share, such as `$`, `£`, `¥` or `kr`, where the document was issued, as the document itself shows it: the vendor's address, a city or a landmark in its name or header, its phone number's format, its tax identifiers or the name its tax goes by.
 
 When none of these settles it, `currency` stays empty: a missing currency is safer to display than a wrong one. A document is read as expressed in one currency; a second currency on it, such as a converted total, is not represented.
 
 ## Which lines are line items
 
-Every priced line of the itemized part of the document, in the order printed, including fees, deposits, surcharges, shipping and discounts. The subtotal, tax, total, payment, tender and change lines are never line items: the totals and the tax are the invoice's own amounts, and the payment lines describe how it was paid rather than what was bought. A line's values are taken as printed and never recomputed, so a line that prints no unit price has none, and line amounts are before or after tax exactly as the document itemizes them.
+Every priced line of the document, in the order printed: each product or service, and each fee, deposit, surcharge, shipping charge or discount wherever it is printed, a surcharge below the subtotal included. The subtotal, tax, total, payment, tender and change lines are never line items, and neither is a line that only sums lines already listed, such as a subtotal per category: the totals and the tax are the invoice's own amounts, and the payment lines describe how it was paid rather than what was bought. A line's values are taken as printed and never recomputed, so a line that prints no unit price has none, and line amounts are before or after tax exactly as the document itemizes them.
 
 ## Running it
 
