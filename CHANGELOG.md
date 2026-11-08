@@ -1,5 +1,15 @@
 # Changelog
 
+## [v0.4.0] - 2026-11-08
+
+### Changed
+
+- **`slide_designer` returns each theme paired with its mockup (Breaking)**: `generate_design_proposals_from_rough_brief` returns the new `DesignProposals` concept instead of an `Html` page: `brief`, the polished brief, and `proposals`, a list of `DesignProposal`, each a `theme` with the `mockup` image drawn in it, where the themes and the images previously reached a caller only as two lists matched by position inside the page. The HTML report moves to the newly exported `generate_design_proposals_report`, which takes the same `brief` and shows each mockup in one card beside its own theme. A caller that wants the page names that pipe at the new tag, and one that wants the old pipe exactly stays at `@v0.3.0`.
+
+### Fixed
+
+- **`slide_designer` draws the deck's own title**: the image step now reads the polished brief and draws its `topic` word for word as the deck's title, with the other slides' placeholder content fitting the topic, the audience and the goal, where it previously saw the theme alone and invented a subject and a period of its own. Polishing the brief now keeps the topic exactly as typed.
+
 ## [v0.3.0] - 2026-11-07
 
 ### Added

@@ -2,12 +2,15 @@
 name = "slide_designer"
 display_name = "Slide Designer"
 address = "github.com/Pipelex/methods"
-version = "0.3.0"
-description = "Turn a rough slide-deck brief into design proposals: polish the brief, generate multiple visual themes, render a mockup image for each, and compose an HTML report presenting them all."
+version = "0.4.0"
+description = "Turn a rough slide-deck brief into design proposals: polish the brief, generate multiple visual themes, and draw in each a mockup of the deck titled with its own topic, returning each theme paired with its mockup, or an HTML report presenting them."
 authors = ["Evotis S.A.S"]
 license = "MIT"
 mthds_version = ">=1.0.0"
 main_pipe = "generate_design_proposals_from_rough_brief"
 
 [exports.slide_designer]
-pipes = ["generate_design_proposals_from_rough_brief"]
+pipes = [
+  "generate_design_proposals_from_rough_brief",
+  "generate_design_proposals_report",
+]
