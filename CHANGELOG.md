@@ -1,5 +1,11 @@
 # Changelog
 
+## [v0.4.1] - 2026-11-15
+
+### Added
+
+- **`document_reading`**: reads a document page by page for a caller who will not see it, a person or an agent, and lists every rule, value, threshold, name and constraint each page states or shows, in its exact words, from both the page's OCR text and a picture of the whole page at 100 dpi, one model call a page. Its entry pipe, `read_document`, takes a `document` (a PDF, an image, or a Word or PowerPoint file on a runtime with a document converter) and returns a list of `PageReading`, one per page in page order, each holding its `findings` (`quote`, `kind`, `source`, `note`), what was `unreadable`, what was `not_looked_at` and the `printed_page_number`. The exported `read_pages` takes the `pages` an earlier run extracted and reads them again with no second extraction.
+
 ## [v0.4.0] - 2026-11-08
 
 ### Changed
