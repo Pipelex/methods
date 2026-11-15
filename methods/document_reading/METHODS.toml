@@ -2,7 +2,7 @@
 name = "document_reading"
 display_name = "Document Reading"
 address = "github.com/Pipelex/methods"
-version = "0.4.0"
+version = "0.4.1"
 description = "Read a document page by page for a caller who will not see it: every rule, value, threshold, name and constraint each page states or shows, in its exact words, from both the OCR text and a picture of the page, with what each page could not be read and what was not looked at."
 authors = ["Evotis S.A.S"]
 license = "MIT"
