@@ -1,0 +1,115 @@
+# Reads a document page by page into findings, for a caller who will not see the document: the OCR text of each page
+# and a picture of the whole page at 100 dpi, one model call per page.
+#
+# The method lists everything each page holds and leaves relevance to its caller. A PipeBatch branch is not told its
+# page's position, so a page answer carries no page number of its own: its page is its position in the output list,
+# which the batch keeps in input order, and the caller stamps it.
+
+domain      = "document_reading"
+description = "Reading a document page by page into findings: every rule, value, threshold, name and constraint each page states or shows, in its exact words"
+main_pipe   = "read_document"
+
+[concept.Finding]
+description = "One rule, value, threshold, name or constraint that a page states or shows, in its exact words"
+
+[concept.Finding.structure]
+quote = { type = "text", description = "The exact words on the page, copied character for character; for what a picture only shows, an exact description of one visible element", required = true }
+kind = { choices = [
+  "rule",
+  "value",
+  "threshold",
+  "name",
+  "constraint",
+  "other",
+], description = "What the finding is", required = true }
+source = { choices = [
+  "text",
+  "picture",
+  "both",
+], description = "Whether the page's text, a picture, or both hold the finding", required = true }
+note = { type = "text", description = "What the finding applies to when the quote does not say it, the picture's reading where it differs from the text's, or a doubt about the reading" }
+
+[concept.PageReading]
+description = "Everything one page of a document states or shows, as findings, with what could not be read and what was not looked at"
+
+[concept.PageReading.structure]
+findings            = { type = "list", item_type = "concept", item_concept_ref = "document_reading.Finding", description = "Every rule, value, threshold, name and constraint the page states or shows", required = true }
+unreadable          = { type = "list", item_type = "text", description = "What on the page could not be read with confidence, and why", required = true }
+not_looked_at       = { type = "list", item_type = "text", description = "What the page holds that was not shown, not read or not listed in full", required = true }
+printed_page_number = { type = "text", description = "The page number printed in the page's header or footer, if there is one; never a section or chapter number" }
+
+[pipe.read_document]
+type = "PipeSequence"
+description = "Extract the document's pages, then list what each page states or shows"
+inputs = { document = "Document" }
+output = "PageReading[]"
+steps = [
+  { pipe = "extract_pages", result = "pages" },
+  { pipe = "read_pages", result = "readings" },
+]
+
+[pipe.extract_pages]
+type            = "PipeExtract"
+description     = "Extract the document's pages: the OCR text of each page as Markdown and a picture of the whole page at 100 dpi"
+inputs          = { document = "Document" }
+output          = "Page[]"
+model           = "@default-extract-document"
+max_page_images = 0
+page_views      = true
+page_views_dpi  = 100
+
+[pipe.read_pages]
+type             = "PipeBatch"
+description      = "Read every page with one model call each, answering in the order of the pages given"
+inputs           = { pages = "Page[]" }
+output           = "PageReading[]"
+branch_pipe_code = "read_one_page"
+input_list_name  = "pages"
+input_item_name  = "page"
+
+[pipe.read_one_page]
+type = "PipeLLM"
+description = "List every rule, value, threshold, name and constraint one page states or shows, with its exact words"
+inputs = { page = "Page" }
+output = "PageReading"
+model = { model = "claude-5.5-sonnet", temperature = 0.0, max_tokens = 32000 }
+system_prompt = """
+You read one page of a document for someone who will never see the page. Whatever you leave out is lost to them. You list what the page holds; you never summarize it, judge what matters or drop anything because it seems minor.
+"""
+prompt = """
+Below is one page of a document. You are shown the text an OCR service read from the page, as Markdown, then a picture of the whole page, as "page_view". Read both. The text misses what is only visible: what a figure, chart, diagram or photograph shows, words set in an image, a stamp, a handwritten note, and colours and layout that carry a meaning.
+
+Where the text and the picture disagree:
+
+- on a figure, a word or a name the text holds, keep the text's reading in the quote, give the picture's reading in the note, and name the doubt in unreadable, since the picture is coarser than the scan the text was read from;
+- on a mark, a symbol or a layout the text cannot carry, such as a footnote marker, a tick, an arrow or where an element sits, trust the picture and say so in the note.
+
+List every rule, value, threshold, name and constraint this page states or shows, each as one finding with its exact words. That includes:
+
+- every sentence that says what must, may or must not be done, by whom, when or how, including one in an introduction or a side box;
+- every figure, amount, date, time, duration, percentage, limit, code and identifier, with what it applies to;
+- every person, role, organisation, product, place and document the page names;
+- every footnote, as a finding of its own, with the marker that ties it to the text or the table it qualifies;
+- every table, as one finding per row, quoting the row with its column headers so that each value stays attached to them, as "Header: value; Header: value". A cell merged across several rows or columns is repeated in every row it covers, and a header spanning several columns is repeated in each;
+- everything a picture shows that the text does not: words set in an image, the labels and values of a chart, the steps and branches of a diagram, a stamp, a handwritten note, where an element sits in a layout, what a photograph shows. Quote the words a picture holds exactly. For what is only drawn or photographed, list it element by element: one finding for each visible element that carries a rule, a value or a name, with an exact description of that element as the quote and its source set to "picture";
+- every value read from a drawn chart, such as a bar's height or a point's position, quoted with "about" before it, as "about 30", with its source set to "picture", since it is an estimate and not a printed figure.
+
+For each finding:
+
+- quote: the exact words, copied character for character. Never paraphrase, round, translate or correct them.
+- kind: rule, value, threshold, name, constraint, or other.
+- source: "text" when the words are in the text, "picture" when only a picture shows it, "both" when both do.
+- note: only when needed, to say what the finding applies to when its quote does not (its section, table or marker), to give the picture's reading of a figure the text reads otherwise, or to state a doubt about the reading.
+
+Then give:
+
+- unreadable: anything on the page you could see but could not read with confidence, and why. An empty list when there is none.
+- not_looked_at: anything the page holds that you were not shown, did not read, or did not list in full, such as small print too small to read in the picture, which you should name rather than guess, or a table, a list or a passage you gave only in part. Whenever the page holds more than your findings list, say here what was left out. An empty list only when your findings cover the whole page.
+- printed_page_number: the page number printed in the page's header or footer, if there is one. Never a section, chapter or slide title number, and never the page's position in the document, which you are not told.
+
+Write only what the page holds, in the page's own language. Add no advice, conclusion or knowledge of your own.
+
+The page:
+
+{{ page | with_images }}
+"""
