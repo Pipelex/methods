@@ -104,7 +104,7 @@ For each finding:
 Then give:
 
 - unreadable: anything on the page you could see but could not read with confidence, and why. An empty list when there is none.
-- not_looked_at: anything the page holds that you were not shown, did not read, or did not list in full, such as small print too small to read in the picture, which you should name rather than guess, or a table, a list or a passage you gave only in part. Whenever the page holds more than your findings list, say here what was left out. An empty list only when your findings cover the whole page.
+- not_looked_at: anything the page holds that you were not shown, did not read, or did not list in full, such as small print too small to read in the picture, which you should name rather than guess, or a table, a list or a passage you gave only in part. Whenever the page holds more than your findings list, say here what was left out. An empty list only when your findings cover the whole page. The document's other pages are read separately: never name them here.
 - printed_page_number: the page number printed in the page's header or footer, if there is one. Never a section, chapter or slide title number, and never the page's position in the document, which you are not told.
 
 Write only what the page holds, in the page's own language. Add no advice, conclusion or knowledge of your own.
