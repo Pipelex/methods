@@ -1,0 +1,9 @@
+{
+  "document": {
+    "concept": "native.Document",
+    "content": {
+      "url": "https://raw.githubusercontent.com/Pipelex/pipelex-cookbook/v0.20.7/assets/review_nda/mutual_nda.pdf",
+      "mime_type": "application/pdf"
+    }
+  }
+}
